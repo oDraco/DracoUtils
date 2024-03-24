@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 public class General implements CommandExecutor {
 
-    private String commandUsage = "§cUse /dracoutils <material>";
+    private final String commandUsage = "§cUse /dracoutils <material>";
 
 
     @Override
