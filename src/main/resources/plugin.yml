@@ -1,0 +1,7 @@
+name: DracoUtils
+main: org.github.oDraco.io.DracoUtils
+version: 1.0
+description: Utils plugin I've made to use for my others plugins ;)
+commands:
+  dracoutil:
+    description: Main command
