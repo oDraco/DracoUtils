@@ -1,17 +1,20 @@
 package com.github.oDraco.util;
 
+import com.github.oDraco.entities.AttributeBonus;
+import com.github.oDraco.entities.enums.Attribute;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTEntity;
 import org.bukkit.entity.Player;
 
 import java.security.InvalidParameterException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The type Player manager.
  */
 public abstract class PlayerManager {
-
-    private static final String[] attributes = new String[] {"str","dex","con","wil","mnd","spi"};
 
     /**
      * Gets tp.
@@ -62,8 +65,8 @@ public abstract class PlayerManager {
      * @return new TP
      */
     public static int addTP(Player player, long amount) {
-        if(amount > Integer.MAX_VALUE) return addTP(player, Integer.MAX_VALUE);
-        if(amount < Integer.MIN_VALUE) return addTP(player, Integer.MIN_VALUE);
+        if (amount > Integer.MAX_VALUE) return addTP(player, Integer.MAX_VALUE);
+        if (amount < Integer.MIN_VALUE) return addTP(player, Integer.MIN_VALUE);
         return addTP(player, (int) amount);
     }
 
@@ -74,26 +77,20 @@ public abstract class PlayerManager {
      * @param player    the player
      * @return the attr
      */
-    public static int getAttr(String attribute, Player player) {
+    public static int getAttr(Attribute attribute, Player player) {
         NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
-        switch (attribute.toLowerCase()) {
-            case "strength":
-            case "str":
+        switch (attribute) {
+            case STRENGTH:
                 return playerPersisted.getInteger("jrmcStrI");
-            case "dexterity":
-            case "dex":
+            case DEXTERITY:
                 return playerPersisted.getInteger("jrmcDexI");
-            case "constitution":
-            case "con":
+            case CONSTITUTION:
                 return playerPersisted.getInteger("jrmcCnsI");
-            case "willpower":
-            case "wil":
+            case WILL_POWER:
                 return playerPersisted.getInteger("jrmcWilI");
-            case "mind":
-            case "mnd":
+            case MIND:
                 return playerPersisted.getInteger("jrmcIntI");
-            case "spirit":
-            case "spi":
+            case SPIRIT:
                 return playerPersisted.getInteger("jrmcCncI");
         }
         throw new IllegalArgumentException("Invalid attribute argument! Valid attributes are: str,dex,con,wil,mnd,spi");
@@ -106,31 +103,25 @@ public abstract class PlayerManager {
      * @param player       the player
      * @param newAttribute the new attribute
      */
-    public static void setAttr(String attribute, Player player, int newAttribute) {
+    public static void setAttr(Attribute attribute, Player player, int newAttribute) {
         NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
-        switch (attribute.toLowerCase()) {
-            case "strength":
-            case "str":
+        switch (attribute) {
+            case STRENGTH:
                 playerPersisted.setInteger("jrmcStrI", newAttribute);
                 return;
-            case "dexterity":
-            case "dex":
+            case DEXTERITY:
                 playerPersisted.setInteger("jrmcDexI", newAttribute);
                 return;
-            case "constitution":
-            case "con":
+            case CONSTITUTION:
                 playerPersisted.setInteger("jrmcCnsI", newAttribute);
                 return;
-            case "willpower":
-            case "wil":
+            case WILL_POWER:
                 playerPersisted.setInteger("jrmcWilI", newAttribute);
                 return;
-            case "mind":
-            case "mnd":
+            case MIND:
                 playerPersisted.setInteger("jrmcIntI", newAttribute);
                 return;
-            case "spirit":
-            case "spi":
+            case SPIRIT:
                 playerPersisted.setInteger("jrmcCncI", newAttribute);
                 return;
         }
@@ -140,25 +131,25 @@ public abstract class PlayerManager {
     /**
      * Sets attr.
      *
-     * @param attribute    the attribute
+     * @param attribute    the attribute index
      * @param player       the player
      * @param newAttribute the new attribute
      */
     public static void setAttr(int attribute, Player player, int newAttribute) {
-        if(attribute < 0 || attribute > 5) throw new InvalidParameterException("Attribute Index must be in range 0-5");
-        setAttr(attributes[attribute], player, newAttribute);
+        if (attribute < 0 || attribute > 5) throw new InvalidParameterException("Attribute Index must be in range 0-5");
+        setAttr(Attribute.values()[attribute], player, newAttribute);
     }
 
     /**
      * Gets attr.
      *
-     * @param attribute the attribute
+     * @param attribute the attribute index
      * @param player    the player
      * @return the attr
      */
     public static int getAttr(int attribute, Player player) {
-        if(attribute < 0 || attribute > 5) throw new InvalidParameterException("Attribute Index must be in range 0-5");
-        return getAttr(attributes[attribute], player);
+        if (attribute < 0 || attribute > 5) throw new InvalidParameterException("Attribute Index must be in range 0-5");
+        return getAttr(Attribute.values()[attribute], player);
     }
 
     /**
@@ -186,7 +177,7 @@ public abstract class PlayerManager {
      * @param attr   attributes in an int[]
      */
     public static void setAttributes(Player player, int[] attr) {
-        if(attr.length != 6) throw new InvalidParameterException("Attribute array length must be 6");
+        if (attr.length != 6) throw new InvalidParameterException("Attribute array length must be 6");
         NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
         playerPersisted.setInteger("jrmcStrI", attr[0]);
         playerPersisted.setInteger("jrmcDexI", attr[1]);
@@ -213,7 +204,7 @@ public abstract class PlayerManager {
      * @param newHealth the new health
      */
     public static void setDBCHealth(Player player, int newHealth) {
-        getPlayerPersisted(new NBTEntity(player)).setInteger("jrmcBdy",newHealth);
+        getPlayerPersisted(new NBTEntity(player)).setInteger("jrmcBdy", newHealth);
     }
 
     /**
@@ -283,7 +274,7 @@ public abstract class PlayerManager {
      * @param resetTP if player TP would be resetted
      */
     public static void resetPlayer(Player player, boolean resetTP) {
-        if(resetTP) setTP(player, 0);
+        if (resetTP) setTP(player, 0);
         getPlayerPersisted(new NBTEntity(player)).setByte("jrmcAccept", (byte) 0);
     }
 
@@ -320,8 +311,8 @@ public abstract class PlayerManager {
      * Damages a DBC player as another player;
      *
      * @param attacker the attacker
-     * @param victim the victim
-     * @param damage attack damage
+     * @param victim   the victim
+     * @param damage   attack damage
      * @return the victim new health
      */
     public static int damageAsPlayer(Player attacker, Player victim, int damage) {
@@ -331,12 +322,12 @@ public abstract class PlayerManager {
         playerPersistedVictim.setInteger("jrmcLastDamageReceived", damage);
         playerPersistedAttacker.setInteger("jrmcLastDamageDealt", damage);
 
-        playerPersistedVictim.setString("jrmcLastAttacker", attacker.getName()+";"+damage);
+        playerPersistedVictim.setString("jrmcLastAttacker", attacker.getName() + ";" + damage);
         playerPersistedAttacker.setString("jrmcAttackLstPlyrNam", victim.getUniqueId().toString());
 
-        int epoch = (int)(System.currentTimeMillis()/1000L);
-        playerPersistedAttacker.setInteger("jrmcAttackLstPlyrTm", epoch+5);
-        playerPersistedVictim.setInteger("jrmcAttackTimer", epoch+5);
+        int epoch = (int) (System.currentTimeMillis() / 1000L);
+        playerPersistedAttacker.setInteger("jrmcAttackLstPlyrTm", epoch + 5);
+        playerPersistedVictim.setInteger("jrmcAttackTimer", epoch + 5);
 
         return damagePlayer(victim, damage);
     }
@@ -353,7 +344,6 @@ public abstract class PlayerManager {
     }
 
     /**
-     *
      * Removes an amount of KI from a DBC player;
      *
      * @param player the player
@@ -365,7 +355,6 @@ public abstract class PlayerManager {
     }
 
     /**
-     *
      * Removes an amount of stamina from a DBC player;
      *
      * @param player the player
@@ -376,12 +365,100 @@ public abstract class PlayerManager {
         return removeStat(player, amount, "jrmcStamina");
     }
 
+    /**
+     * Add bonus attribute.
+     *
+     * @param player      the player
+     * @param bonus       the bonus
+     * @param addToBottom if the attribute should go to bottom/end (true) or top/start (true)
+     */
+    public static void addBonusAttribute(Player player, AttributeBonus bonus, boolean addToBottom) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        String key = "jrmcAttrBonus" + bonus.getAttribute().getAcronym();
+        String currentBonus = playerPersisted.getString(key);
+        if (currentBonus == null || currentBonus.isEmpty()) {
+            playerPersisted.setString(key, bonus.toString());
+            return;
+        }
+        if (currentBonus.contains(bonus.getName()))
+            throw new IllegalStateException("Player already have a attribute bonus with the same ID");
+        currentBonus = addToBottom ?
+                currentBonus + "|" + bonus :
+                bonus + "|" + currentBonus;
+        playerPersisted.setString(key, currentBonus);
+    }
+
+    /**
+     * Add bonus attribute.
+     *
+     * @param player      the player
+     * @param bonus       the bonus
+     */
+    public static void addBonusAttribute(Player player, AttributeBonus bonus) {
+        addBonusAttribute(player, bonus, true);
+    }
+
+    /**
+     * Remove bonus attribute boolean.
+     *
+     * @param player the player
+     * @param bonus  the bonus
+     * @return true, if the desired bonus is removed
+     */
+    public static boolean removeBonusAttribute(Player player, AttributeBonus bonus) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        Attribute attr = bonus.getAttribute();
+        String key = "jrmcAttrBonus" + attr.getAcronym();
+        String currentBonus = playerPersisted.getString(key);
+        if(currentBonus == null || currentBonus.isEmpty()) return false;
+        List<AttributeBonus> bonuses = Arrays.stream(currentBonus.split("\\|")).map(x -> AttributeBonus.fromString(attr, x)).collect(Collectors.toList());
+        if(!bonuses.remove(bonus)) return false;
+        String newBonus = bonuses.stream().map(AttributeBonus::toString).collect(Collectors.joining("|"));
+        playerPersisted.setString(key, newBonus);
+        return true;
+    }
+
+    /**
+     * Remove bonus attribute boolean.
+     *
+     * @param player the player
+     * @param attr the bonus attribute
+     * @param bonusID  the bonus ID (name)
+     * @return true, if the desired bonus is removed
+     */
+    public static boolean removeBonusAttribute(Player player, Attribute attr, String bonusID) {
+        return removeBonusAttribute(player, new AttributeBonus(attr, bonusID, "+0"));
+    }
+
+    /**
+     * Change bonus attribute.
+     *
+     * @param player     the player
+     * @param attr       the attribute bonus
+     * @param oldBonusID the old bonus id
+     * @param newValue   the new bonus value
+     */
+    public static void changeBonusAttribute(Player player, Attribute attr, String oldBonusID, String newValue) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        String key = "jrmcAttrBonus" + attr.getAcronym();
+        String currentBonus = playerPersisted.getString(key);
+        if(currentBonus == null || currentBonus.isEmpty() || !currentBonus.contains(oldBonusID)) return;
+        List<AttributeBonus> bonuses = Arrays.stream(currentBonus.split("\\|")).map(x -> AttributeBonus.fromString(attr, x)).collect(Collectors.toList());
+        for(AttributeBonus bonus : bonuses) {
+            if(!bonus.getName().equals(oldBonusID)) continue;
+            bonus.setValue(newValue);
+            break;
+        }
+        String newBonus = bonuses.stream().map(AttributeBonus::toString).collect(Collectors.joining("|"));
+        playerPersisted.setString(key, newBonus);
+    }
+
     private static int removeStat(Player player, int amount, String tag) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         int oldValue = playerPersisted.getInteger(tag);
-        long newValue = (long) oldValue-amount;
-        if(newValue < 0) newValue = 0;
-        if(newValue > Integer.MAX_VALUE) newValue = Integer.MIN_VALUE;
+        long newValue = (long) oldValue - amount;
+        if (newValue < 0) newValue = 0;
+        if (newValue > Integer.MAX_VALUE) newValue = Integer.MIN_VALUE;
         playerPersisted.setInteger(tag, Math.toIntExact(newValue));
         return Math.toIntExact(newValue);
     }

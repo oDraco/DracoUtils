@@ -1,6 +1,7 @@
 package com.github.oDraco;
 
 import com.github.oDraco.commands.Light;
+import com.github.oDraco.commands.tabCompleters.GeneralTab;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.github.oDraco.commands.General;
 
@@ -18,6 +19,7 @@ public class DracoUtils extends JavaPlugin {
                 "                                                  ");
         getLogger().info("[DracoUtils] Iniciado com sucesso!");
         getCommand("dracoutils").setExecutor(new General());
+        getCommand("dracoutils").setTabCompleter(new GeneralTab());
         getCommand("luz").setExecutor(new Light());
     }
 }

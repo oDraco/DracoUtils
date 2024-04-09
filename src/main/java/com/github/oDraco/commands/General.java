@@ -2,13 +2,13 @@ package com.github.oDraco.commands;
 
 import com.github.oDraco.entities.enums.Rarity;
 import com.github.oDraco.entities.enums.Type;
+import com.github.oDraco.util.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import com.github.oDraco.util.ItemUtils;
 
 public class General implements CommandExecutor {
 
