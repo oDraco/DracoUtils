@@ -1,4 +1,4 @@
-package org.github.oDraco.io.entities.enums;
+package com.github.oDraco.entities.enums;
 
 public enum Rarity {
 

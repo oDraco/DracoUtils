@@ -1,4 +1,4 @@
-package org.github.oDraco.io.util;
+package com.github.oDraco.util;
 
 import java.text.DecimalFormat;
 import java.util.*;

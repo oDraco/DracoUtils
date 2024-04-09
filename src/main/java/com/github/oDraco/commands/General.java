@@ -1,19 +1,19 @@
-package org.github.oDraco.io.commands;
+package com.github.oDraco.commands;
 
+import com.github.oDraco.entities.enums.Rarity;
+import com.github.oDraco.entities.enums.Type;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.github.oDraco.io.entities.enums.Rarity;
-import org.github.oDraco.io.entities.enums.Type;
-import org.github.oDraco.io.util.ItemUtils;
+import com.github.oDraco.util.ItemUtils;
 
 public class General implements CommandExecutor {
 
-    private final String commandBaseUsage = "§cUse /dracoutils <material|format>";
-    private final String commandFormatUsage = "§cUse /dracoutils format <raridade> <categoria> <nome>";
+    private static final String commandBaseUsage = "§cUse /dracoutils <material|format|unbreakable>";
+    private static final String commandFormatUsage = "§cUse /dracoutils format <raridade> <categoria> <nome>";
 
 
     @Override
@@ -30,6 +30,7 @@ public class General implements CommandExecutor {
             commandSender.sendMessage(commandBaseUsage);
             return true;
         }
+        Player player = (Player) commandSender;
         switch (args[0].toLowerCase()) {
             case "material":
                 commandSender.sendMessage("§6§lINFO §aMaterial: §7§o"+((Player) commandSender).getInventory().getItemInHand().getType());
@@ -64,7 +65,6 @@ public class General implements CommandExecutor {
                 for(int i=4; i<args.length; i++) {
                     name = String.join(" ", name, args[i]);
                 }
-                Player player = (Player) commandSender;
                 ItemStack item = player.getItemInHand();
                 if(item == null || item.getType() == Material.AIR) {
                     commandSender.sendMessage("§4§lERRO! §cVocê precisa estar segurando um item para utilizar este comando!");
@@ -72,9 +72,33 @@ public class General implements CommandExecutor {
                 }
                 player.setItemInHand(ItemUtils.formatItem(item,name,rarity,type));
                 return true;
+            case "unbreaking":
+            case "unbreakable":
+                return handleUnbreakable(player, args);
             default:
                 commandSender.sendMessage(commandBaseUsage);
         }
+        return true;
+    }
+
+    private boolean handleUnbreakable(Player player, String[] args) {
+        if(args.length < 2) {
+            player.sendMessage("§cUse /dracoutils unbreakable <false|true>");
+            return true;
+        }
+        boolean unbreaking;
+        try {
+            unbreaking = Boolean.parseBoolean(args[1]);
+        } catch (Exception e) {
+            player.sendMessage("§4§lERRO! §cUtilize somente true/false");
+            return true;
+        }
+        ItemStack item = player.getItemInHand();
+        if(item == null || item.getType() == Material.AIR) {
+            player.sendMessage("§4§lERRO! §cVocê precisa estar segurando um item para utilizar este comando!");
+            return true;
+        }
+        player.setItemInHand(ItemUtils.setUnbreakable(item, unbreaking));
         return true;
     }
 

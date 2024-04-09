@@ -1,7 +1,12 @@
 name: DracoUtils
-main: org.github.oDraco.io.DracoUtils
+main: com.github.oDraco.DracoUtils
 version: 1.0
 description: Utils plugin I've made to use for my others plugins ;)
+depend:
+  - NBTAPI
 commands:
-  dracoutil:
+  dracoutils:
     description: Main command
+    aliases: dracoutil
+  luz:
+    description: Enables/disable night vision
