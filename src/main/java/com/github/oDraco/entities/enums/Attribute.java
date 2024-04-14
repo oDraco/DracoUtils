@@ -17,4 +17,11 @@ public enum Attribute {
     public String getAcronym() {
         return acronym;
     }
+
+    public static Attribute fromAcronym(String input) {
+        for (Attribute value : Attribute.values()) {
+            if(value.getAcronym().equalsIgnoreCase(input)) return value;
+        }
+        return null;
+    }
 }

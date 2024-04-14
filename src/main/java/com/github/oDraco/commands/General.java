@@ -33,7 +33,7 @@ public class General implements CommandExecutor {
         Player player = (Player) commandSender;
         switch (args[0].toLowerCase()) {
             case "material":
-                commandSender.sendMessage("§6§lINFO §aMaterial: §7§o"+((Player) commandSender).getInventory().getItemInHand().getType());
+                commandSender.sendMessage("§6§lINFO §aMaterial: §7§o"+((Player) commandSender).getInventory().getItemInHand().getType().name());
                 return true;
             case "rarity":
                 commandSender.sendMessage("§6§lINFO §eRaridades disponíveis:");

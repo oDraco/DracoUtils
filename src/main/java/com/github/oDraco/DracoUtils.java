@@ -2,6 +2,8 @@ package com.github.oDraco;
 
 import com.github.oDraco.commands.Light;
 import com.github.oDraco.commands.tabCompleters.GeneralTab;
+import com.github.oDraco.entities.listeners.QuitListener;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.github.oDraco.commands.General;
 
@@ -9,6 +11,13 @@ public class DracoUtils extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getCommand("dracoutils").setExecutor(new General());
+        getCommand("dracoutils").setTabCompleter(new GeneralTab());
+
+        getCommand("luz").setExecutor(new Light());
+
+        Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
+
         getLogger().info("  _____                        _    _ _   _ _     \n" +
                 " |  __ \\                      | |  | | | (_) |    \n" +
                 " | |  | |_ __ __ _  ___ ___   | |  | | |_ _| |___ \n" +
@@ -18,8 +27,5 @@ public class DracoUtils extends JavaPlugin {
                 "                                                  \n" +
                 "                                                  ");
         getLogger().info("[DracoUtils] Iniciado com sucesso!");
-        getCommand("dracoutils").setExecutor(new General());
-        getCommand("dracoutils").setTabCompleter(new GeneralTab());
-        getCommand("luz").setExecutor(new Light());
     }
 }

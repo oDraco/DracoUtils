@@ -371,8 +371,9 @@ public abstract class PlayerManager {
      * @param player      the player
      * @param bonus       the bonus
      * @param addToBottom if the attribute should go to bottom/end (true) or top/start (true)
+     * @param unrestrict if true, allows to have 2+ bonuses with the same ID (can be buggy)
      */
-    public static void addBonusAttribute(Player player, AttributeBonus bonus, boolean addToBottom) {
+    public static void addBonusAttribute(Player player, AttributeBonus bonus, boolean addToBottom, boolean unrestrict) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         String key = "jrmcAttrBonus" + bonus.getAttribute().getAcronym();
         String currentBonus = playerPersisted.getString(key);
@@ -380,7 +381,7 @@ public abstract class PlayerManager {
             playerPersisted.setString(key, bonus.toString());
             return;
         }
-        if (currentBonus.contains(bonus.getName()))
+        if (!unrestrict && currentBonus.contains(bonus.getName()))
             throw new IllegalStateException("Player already have a attribute bonus with the same ID");
         currentBonus = addToBottom ?
                 currentBonus + "|" + bonus :
@@ -395,7 +396,7 @@ public abstract class PlayerManager {
      * @param bonus       the bonus
      */
     public static void addBonusAttribute(Player player, AttributeBonus bonus) {
-        addBonusAttribute(player, bonus, true);
+        addBonusAttribute(player, bonus, true, false);
     }
 
     /**
@@ -451,6 +452,20 @@ public abstract class PlayerManager {
         }
         String newBonus = bonuses.stream().map(AttributeBonus::toString).collect(Collectors.joining("|"));
         playerPersisted.setString(key, newBonus);
+    }
+
+    /**
+     * Check if the player has an attribute bonus with the specified ID
+     *
+     * @param player  the player
+     * @param attr    the attr
+     * @param bonusID the bonus id
+     * @return if player has the attribute bonus
+     */
+    public static boolean hasBonusAttribute(Player player, Attribute attr, String bonusID) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        String currentBonus = playerPersisted.getString("jrmcAttrBonus" + attr.getAcronym());
+        return currentBonus != null && !currentBonus.isEmpty() && currentBonus.contains(bonusID);
     }
 
     private static int removeStat(Player player, int amount, String tag) {
