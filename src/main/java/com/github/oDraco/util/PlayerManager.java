@@ -468,6 +468,18 @@ public abstract class PlayerManager {
         return currentBonus != null && !currentBonus.isEmpty() && currentBonus.contains(bonusID);
     }
 
+
+    /**
+     * Gets player's DBC level.
+     *
+     * @param player the player
+     * @return the level
+     */
+    public static int getLevel(Player player) {
+        int i = Arrays.stream(getAttributes(player)).sum() / 5 - 11;
+        return Math.max(i, 0);
+    }
+
     private static int removeStat(Player player, int amount, String tag) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         int oldValue = playerPersisted.getInteger(tag);

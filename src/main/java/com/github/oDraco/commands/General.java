@@ -3,6 +3,9 @@ package com.github.oDraco.commands;
 import com.github.oDraco.entities.enums.Rarity;
 import com.github.oDraco.entities.enums.Type;
 import com.github.oDraco.util.ItemUtils;
+import com.mohistmc.api.ChatComponentAPI;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class General implements CommandExecutor {
 
-    private static final String commandBaseUsage = "§cUse /dracoutils <material|format|unbreakable>";
+    private static final String commandBaseUsage = "§cUse /dracoutils <material|format|unbreakable|localID>";
     private static final String commandFormatUsage = "§cUse /dracoutils format <raridade> <categoria> <nome>";
 
 
@@ -33,7 +36,11 @@ public class General implements CommandExecutor {
         Player player = (Player) commandSender;
         switch (args[0].toLowerCase()) {
             case "material":
-                commandSender.sendMessage("§6§lINFO §aMaterial: §7§o"+((Player) commandSender).getInventory().getItemInHand().getType().name());
+                TextComponent materialInfo = new TextComponent("§6§lINFO §aMaterial:");
+                TextComponent material = new TextComponent("§7§o"+player.getItemInHand().getType().name());
+                material.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, player.getItemInHand().getType().name()));
+                materialInfo.addExtra(material);
+                player.spigot().sendMessage(materialInfo);
                 return true;
             case "rarity":
                 commandSender.sendMessage("§6§lINFO §eRaridades disponíveis:");
@@ -48,33 +55,12 @@ public class General implements CommandExecutor {
                 }
                 return true;
             case "format":
-                if(args.length < 4) {
-                    commandSender.sendMessage(commandFormatUsage);
-                    return true;
-                }
-                Rarity rarity;
-                Type type;
-                try {
-                    rarity = Rarity.valueOf(args[1].toUpperCase());
-                    type = Type.valueOf(args[2].toUpperCase());
-                } catch (IllegalArgumentException e) {
-                    commandSender.sendMessage("§4§lERRO! §cRaridade/tipo inválido, utilize /dracoutils <rarity|type> para ver as raridades/tipos disponíveis.");
-                    return true;
-                }
-                String name = args[3];
-                for(int i=4; i<args.length; i++) {
-                    name = String.join(" ", name, args[i]);
-                }
-                ItemStack item = player.getItemInHand();
-                if(item == null || item.getType() == Material.AIR) {
-                    commandSender.sendMessage("§4§lERRO! §cVocê precisa estar segurando um item para utilizar este comando!");
-                    return true;
-                }
-                player.setItemInHand(ItemUtils.formatItem(item,name,rarity,type));
-                return true;
+                return handleFormat(player, args);
             case "unbreaking":
             case "unbreakable":
                 return handleUnbreakable(player, args);
+            case "localid":
+                return handleLocalID(player);
             default:
                 commandSender.sendMessage(commandBaseUsage);
         }
@@ -99,6 +85,52 @@ public class General implements CommandExecutor {
             return true;
         }
         player.setItemInHand(ItemUtils.setUnbreakable(item, unbreaking));
+        return true;
+    }
+
+    private boolean handleFormat(Player player, String[] args) {
+        if(args.length < 4) {
+            player.sendMessage(commandFormatUsage);
+            return true;
+        }
+        Rarity rarity;
+        Type type;
+        try {
+            rarity = Rarity.valueOf(args[1].toUpperCase());
+            type = Type.valueOf(args[2].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            player.sendMessage("§4§lERRO! §cRaridade/tipo inválido, utilize /dracoutils <rarity|type> para ver as raridades/tipos disponíveis.");
+            return true;
+        }
+        String name = args[3];
+        for(int i=4; i<args.length; i++) {
+            name = String.join(" ", name, args[i]);
+        }
+        ItemStack item = player.getItemInHand();
+        if(!ItemUtils.isValid(item)) {
+            player.sendMessage("§4§lERRO! §cVocê precisa estar segurando um item para utilizar este comando!");
+            return true;
+        }
+        player.setItemInHand(ItemUtils.formatItem(item,name,rarity,type));
+        return true;
+    }
+
+    private boolean handleLocalID(Player player) {
+        ItemStack item = player.getItemInHand();
+        if(!ItemUtils.isValid(item)) {
+            player.sendMessage("§4§lERRO! §cVocê precisa estar segurando um item para utilizar este comando!");
+            return true;
+        }
+        try {
+            TextComponent base = new TextComponent("§6§lINFO §aID Local:");
+            TextComponent id = new TextComponent("§7§o"+ItemUtils.getArmourersLocalID(item));
+            id.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.valueOf(ItemUtils.getArmourersLocalID(item))));
+            base.addExtra(id);
+            player.spigot().sendMessage(base);
+        }
+        catch (IllegalStateException e) {
+            player.sendMessage("§4§lERRO! §cO item que você segura não contém uma skin do Armourer's Workshop!");
+        }
         return true;
     }
 

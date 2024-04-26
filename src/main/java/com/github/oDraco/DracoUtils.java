@@ -18,7 +18,7 @@ public class DracoUtils extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
 
-        getLogger().info("  _____                        _    _ _   _ _     \n" +
+        getLogger().info("\n  _____                        _    _ _   _ _     \n" +
                 " |  __ \\                      | |  | | | (_) |    \n" +
                 " | |  | |_ __ __ _  ___ ___   | |  | | |_ _| |___ \n" +
                 " | |  | | '__/ _` |/ __/ _ \\  | |  | | __| | / __|\n" +
@@ -26,6 +26,6 @@ public class DracoUtils extends JavaPlugin {
                 " |_____/|_|  \\__,_|\\___\\___/   \\____/ \\__|_|_|___/\n" +
                 "                                                  \n" +
                 "                                                  ");
-        getLogger().info("[DracoUtils] Iniciado com sucesso!");
+        getLogger().info("Iniciado com sucesso! Versão: " + getDescription().getVersion());
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class GeneralTab implements TabCompleter {
 
-    private final static String[] COMPLETIONS = new String[] {"format", "material", "unbreakable", "rarity", "type"};
+    private final static String[] COMPLETIONS = new String[] {"format", "material", "unbreakable", "rarity", "type", "localID"};
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if(!sender.hasPermission("draco.utils.general")) return null;
