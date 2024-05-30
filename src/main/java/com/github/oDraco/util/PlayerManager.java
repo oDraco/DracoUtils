@@ -1,14 +1,17 @@
 package com.github.oDraco.util;
 
 import com.github.oDraco.entities.AttributeBonus;
-import com.github.oDraco.entities.enums.Attribute;
+import com.github.oDraco.entities.enums.DBCAttribute;
+import com.github.oDraco.entities.enums.DBCSkill;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTEntity;
 import org.bukkit.entity.Player;
 
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -77,7 +80,7 @@ public abstract class PlayerManager {
      * @param player    the player
      * @return the attr
      */
-    public static int getAttr(Attribute attribute, Player player) {
+    public static int getAttr(DBCAttribute attribute, Player player) {
         NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
         switch (attribute) {
             case STRENGTH:
@@ -103,7 +106,7 @@ public abstract class PlayerManager {
      * @param player       the player
      * @param newAttribute the new attribute
      */
-    public static void setAttr(Attribute attribute, Player player, int newAttribute) {
+    public static void setAttr(DBCAttribute attribute, Player player, int newAttribute) {
         NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
         switch (attribute) {
             case STRENGTH:
@@ -137,7 +140,7 @@ public abstract class PlayerManager {
      */
     public static void setAttr(int attribute, Player player, int newAttribute) {
         if (attribute < 0 || attribute > 5) throw new InvalidParameterException("Attribute Index must be in range 0-5");
-        setAttr(Attribute.values()[attribute], player, newAttribute);
+        setAttr(DBCAttribute.values()[attribute], player, newAttribute);
     }
 
     /**
@@ -149,7 +152,7 @@ public abstract class PlayerManager {
      */
     public static int getAttr(int attribute, Player player) {
         if (attribute < 0 || attribute > 5) throw new InvalidParameterException("Attribute Index must be in range 0-5");
-        return getAttr(Attribute.values()[attribute], player);
+        return getAttr(DBCAttribute.values()[attribute], player);
     }
 
     /**
@@ -213,8 +216,8 @@ public abstract class PlayerManager {
      * @param player the player
      * @return the dbc release
      */
-    public static short getDBCRelease(Player player) {
-        return getPlayerPersisted(new NBTEntity(player)).getShort("jrmcRelease");
+    public static byte getDBCRelease(Player player) {
+        return getPlayerPersisted(new NBTEntity(player)).getByte("jrmcRelease");
     }
 
     /**
@@ -223,8 +226,8 @@ public abstract class PlayerManager {
      * @param player     the player
      * @param newRelease the new release
      */
-    public static void setDBCRelease(Player player, short newRelease) {
-        getPlayerPersisted(new NBTEntity(player)).setShort("jrmcRelease", newRelease);
+    public static void setDBCRelease(Player player, byte newRelease) {
+        getPlayerPersisted(new NBTEntity(player)).setByte("jrmcRelease", newRelease);
     }
 
     /**
@@ -285,6 +288,49 @@ public abstract class PlayerManager {
      */
     public static void resetDBCSkills(Player player) {
         getPlayerPersisted(new NBTEntity(player)).setString("jrmcSSlts", "");
+    }
+
+
+    /**
+     * Gets the DBC skill level for a player.
+     *
+     * @param player the player
+     * @param skill  the skill
+     * @return the skill level, or 0 if the player doesn't have the skill.
+     */
+    public static int getSkillLevel(Player player, DBCSkill skill) {
+        int level = 0;
+        String skillsTxt = getPlayerPersisted(new NBTEntity(player)).getString("jrmcSSlts");
+        if (skillsTxt.contains(skill.getSymbol())) {
+            for (String skillString : skillsTxt.split(",")) {
+                if (skillString.contains(skill.getSymbol()))
+                    return Integer.parseInt(skillString.replace(skill.getSymbol(), "")) + 1;
+            }
+        }
+        return level;
+    }
+
+    /**
+     * Sets the DBC skill level for a player.
+     *
+     * @param player the player
+     * @param skill  the skill
+     * @param level  the level (if 0, removes the skill)
+     */
+    public static void setSkillLevel(Player player, DBCSkill skill, int level) {
+        NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
+        String skillsTxt = playerPersisted.getString("jrmcSSlts");
+        String[] fields = skillsTxt.split(",");
+        Set<String> newFields = new HashSet<>();
+        for (String field : fields) {
+            if (field.contains(skill.getSymbol())) {
+                if(level <= 0)
+                    continue;
+                field = skill.getSymbol() + (level - 1);
+            }
+            newFields.add(field);
+        }
+        playerPersisted.setString("jrmcSSlts", String.join(",", newFields));
     }
 
     /**
@@ -371,7 +417,7 @@ public abstract class PlayerManager {
      * @param player      the player
      * @param bonus       the bonus
      * @param addToBottom if the attribute should go to bottom/end (true) or top/start (true)
-     * @param unrestrict if true, allows to have 2+ bonuses with the same ID (can be buggy)
+     * @param unrestrict  if true, allows to have 2+ bonuses with the same ID (can be buggy)
      */
     public static void addBonusAttribute(Player player, AttributeBonus bonus, boolean addToBottom, boolean unrestrict) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
@@ -392,8 +438,8 @@ public abstract class PlayerManager {
     /**
      * Add bonus attribute.
      *
-     * @param player      the player
-     * @param bonus       the bonus
+     * @param player the player
+     * @param bonus  the bonus
      */
     public static void addBonusAttribute(Player player, AttributeBonus bonus) {
         addBonusAttribute(player, bonus, true, false);
@@ -408,12 +454,12 @@ public abstract class PlayerManager {
      */
     public static boolean removeBonusAttribute(Player player, AttributeBonus bonus) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
-        Attribute attr = bonus.getAttribute();
+        DBCAttribute attr = bonus.getAttribute();
         String key = "jrmcAttrBonus" + attr.getAcronym();
         String currentBonus = playerPersisted.getString(key);
-        if(currentBonus == null || currentBonus.isEmpty()) return false;
+        if (currentBonus == null || currentBonus.isEmpty()) return false;
         List<AttributeBonus> bonuses = Arrays.stream(currentBonus.split("\\|")).map(x -> AttributeBonus.fromString(attr, x)).collect(Collectors.toList());
-        if(!bonuses.remove(bonus)) return false;
+        if (!bonuses.remove(bonus)) return false;
         String newBonus = bonuses.stream().map(AttributeBonus::toString).collect(Collectors.joining("|"));
         playerPersisted.setString(key, newBonus);
         return true;
@@ -422,12 +468,12 @@ public abstract class PlayerManager {
     /**
      * Remove bonus attribute boolean.
      *
-     * @param player the player
-     * @param attr the bonus attribute
-     * @param bonusID  the bonus ID (name)
+     * @param player  the player
+     * @param attr    the bonus attribute
+     * @param bonusID the bonus ID (name)
      * @return true, if the desired bonus is removed
      */
-    public static boolean removeBonusAttribute(Player player, Attribute attr, String bonusID) {
+    public static boolean removeBonusAttribute(Player player, DBCAttribute attr, String bonusID) {
         return removeBonusAttribute(player, new AttributeBonus(attr, bonusID, "+0"));
     }
 
@@ -439,14 +485,14 @@ public abstract class PlayerManager {
      * @param oldBonusID the old bonus id
      * @param newValue   the new bonus value
      */
-    public static void changeBonusAttribute(Player player, Attribute attr, String oldBonusID, String newValue) {
+    public static void changeBonusAttribute(Player player, DBCAttribute attr, String oldBonusID, String newValue) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         String key = "jrmcAttrBonus" + attr.getAcronym();
         String currentBonus = playerPersisted.getString(key);
-        if(currentBonus == null || currentBonus.isEmpty() || !currentBonus.contains(oldBonusID)) return;
+        if (currentBonus == null || currentBonus.isEmpty() || !currentBonus.contains(oldBonusID)) return;
         List<AttributeBonus> bonuses = Arrays.stream(currentBonus.split("\\|")).map(x -> AttributeBonus.fromString(attr, x)).collect(Collectors.toList());
-        for(AttributeBonus bonus : bonuses) {
-            if(!bonus.getName().equals(oldBonusID)) continue;
+        for (AttributeBonus bonus : bonuses) {
+            if (!bonus.getName().equals(oldBonusID)) continue;
             bonus.setValue(newValue);
             break;
         }
@@ -462,7 +508,7 @@ public abstract class PlayerManager {
      * @param bonusID the bonus id
      * @return if player has the attribute bonus
      */
-    public static boolean hasBonusAttribute(Player player, Attribute attr, String bonusID) {
+    public static boolean hasBonusAttribute(Player player, DBCAttribute attr, String bonusID) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         String currentBonus = playerPersisted.getString("jrmcAttrBonus" + attr.getAcronym());
         return currentBonus != null && !currentBonus.isEmpty() && currentBonus.contains(bonusID);

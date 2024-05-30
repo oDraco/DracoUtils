@@ -4,6 +4,8 @@ version: 1.0
 description: Utils plugin I've made to use for my others plugins ;)
 depend:
   - NBTAPI
+softdepend:
+  - HolographicDisplays
 commands:
   dracoutils:
     description: Main command

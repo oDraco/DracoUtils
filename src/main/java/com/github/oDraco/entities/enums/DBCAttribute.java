@@ -1,6 +1,6 @@
 package com.github.oDraco.entities.enums;
 
-public enum Attribute {
+public enum DBCAttribute {
     STRENGTH("str"),
     DEXTERITY("dex"),
     CONSTITUTION("con"),
@@ -10,7 +10,7 @@ public enum Attribute {
 
     private final String acronym;
 
-    Attribute(String acronym) {
+    DBCAttribute(String acronym) {
         this.acronym = acronym;
     }
 
@@ -18,8 +18,8 @@ public enum Attribute {
         return acronym;
     }
 
-    public static Attribute fromAcronym(String input) {
-        for (Attribute value : Attribute.values()) {
+    public static DBCAttribute fromAcronym(String input) {
+        for (DBCAttribute value : DBCAttribute.values()) {
             if(value.getAcronym().equalsIgnoreCase(input)) return value;
         }
         return null;

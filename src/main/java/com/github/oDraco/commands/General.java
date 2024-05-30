@@ -3,19 +3,23 @@ package com.github.oDraco.commands;
 import com.github.oDraco.entities.enums.Rarity;
 import com.github.oDraco.entities.enums.Type;
 import com.github.oDraco.util.ItemUtils;
-import com.mohistmc.api.ChatComponentAPI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class General implements CommandExecutor {
 
-    private static final String commandBaseUsage = "§cUse /dracoutils <material|format|unbreakable|localID>";
+    private static final String commandBaseUsage = "§cUse /dracoutils <item|material|format|unbreakable|localID|ip>";
     private static final String commandFormatUsage = "§cUse /dracoutils format <raridade> <categoria> <nome>";
 
 
@@ -34,11 +38,14 @@ public class General implements CommandExecutor {
             return true;
         }
         Player player = (Player) commandSender;
+        boolean advMaterial = false;
         switch (args[0].toLowerCase()) {
+            case "item":
+                advMaterial = true;
             case "material":
-                TextComponent materialInfo = new TextComponent("§6§lINFO §aMaterial:");
-                TextComponent material = new TextComponent("§7§o"+player.getItemInHand().getType().name());
-                material.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, player.getItemInHand().getType().name()));
+                TextComponent materialInfo = new TextComponent("§6§lINFO §a"+(advMaterial ? "Item":"Material")+": ");
+                TextComponent material = new TextComponent("§7§o"+player.getItemInHand().getType().name()+(advMaterial ? ":"+player.getItemInHand().getDurability(): ""));
+                material.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, player.getItemInHand().getType().name()+(advMaterial ? ":"+player.getItemInHand().getDurability(): "")));
                 materialInfo.addExtra(material);
                 player.spigot().sendMessage(materialInfo);
                 return true;
@@ -61,9 +68,26 @@ public class General implements CommandExecutor {
                 return handleUnbreakable(player, args);
             case "localid":
                 return handleLocalID(player);
+            case "ip":
+                try {
+                    return handleIP(player);
+                } catch (UnknownHostException e) {
+                    player.sendMessage("§4§lERRO! §cUm erro ocorreu ao buscar o IP do servidor: " + e.getMessage());
+                }
             default:
                 commandSender.sendMessage(commandBaseUsage);
         }
+        return true;
+    }
+
+    private boolean handleIP(Player player) throws UnknownHostException {
+        Server server = Bukkit.getServer();
+        TextComponent ipInfo = new TextComponent("§6§lINFO §aIP & Porta do Servidor: ");
+        TextComponent ip = new TextComponent("§7§o"+ InetAddress.getLocalHost().getHostAddress()+":"+server.getPort());
+        ip.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, InetAddress.getLocalHost().getHostAddress()+":"+server.getPort()));
+        ipInfo.addExtra(ip);
+
+        player.spigot().sendMessage(ipInfo);
         return true;
     }
 
@@ -122,7 +146,7 @@ public class General implements CommandExecutor {
             return true;
         }
         try {
-            TextComponent base = new TextComponent("§6§lINFO §aID Local:");
+            TextComponent base = new TextComponent("§6§lINFO §aID Local: ");
             TextComponent id = new TextComponent("§7§o"+ItemUtils.getArmourersLocalID(item));
             id.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.valueOf(ItemUtils.getArmourersLocalID(item))));
             base.addExtra(id);
