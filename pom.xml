@@ -21,6 +21,11 @@
             <url>https://repo.codemc.org/repository/maven-public/</url>
             <layout>default</layout>
         </repository>
+
+        <repository>
+            <id>Engine Hub</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -28,9 +33,16 @@
             <artifactId>item-nbt-api-plugin</artifactId>
             <version>2.12.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>6.1</version>
+        </dependency>
         <!-- Also need:
         MohistMC (1.7.10)
         Spigot (For NMS)
+        JRMCore
+
         -->
     </dependencies>
 </project>

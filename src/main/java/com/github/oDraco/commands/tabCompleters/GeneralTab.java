@@ -11,14 +11,15 @@ import java.util.List;
 
 public class GeneralTab implements TabCompleter {
 
-    private final static String[] COMPLETIONS = new String[] {"format", "material", "unbreakable", "rarity", "type", "localID","item"};
+    private final static String[] COMPLETIONS = new String[]{"format", "material", "unbreakable", "rarity", "type", "localID", "item", "select", "name", "lore"};
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        if(!sender.hasPermission("draco.utils.general")) return null;
-        if(args == null) {
+        if (!sender.hasPermission("draco.utils.general")) return null;
+        if (args == null) {
             return Arrays.asList(COMPLETIONS);
         }
-        if(args.length == 1) {
+        if (args.length == 1) {
             return StringUtil.copyPartialMatches(args[0], Arrays.asList(COMPLETIONS), new ArrayList<>());
         }
         return null;

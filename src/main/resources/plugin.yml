@@ -1,14 +1,22 @@
 name: DracoUtils
 main: com.github.oDraco.DracoUtils
-version: 1.0
+version: 1.2
 description: Utils plugin I've made to use for my others plugins ;)
 depend:
   - NBTAPI
-softdepend:
-  - HolographicDisplays
 commands:
   dracoutils:
     description: Main command
-    aliases: dracoutil
+    aliases:
+      - dracoutil
+      - dutil
+      - dutils
+      - du
+      - dracou
   luz:
     description: Enables/disable night vision
+  lixeira:
+    description: Opens the trashcan
+    aliases:
+      - lixo
+      - trash

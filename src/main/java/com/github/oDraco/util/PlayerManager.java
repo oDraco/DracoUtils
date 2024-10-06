@@ -1,12 +1,20 @@
 package com.github.oDraco.util;
 
+import JinRyuu.JRMCore.JRMCoreConfig;
+import JinRyuu.JRMCore.JRMCoreH;
 import com.github.oDraco.entities.AttributeBonus;
 import com.github.oDraco.entities.enums.DBCAttribute;
+import com.github.oDraco.entities.enums.DBCRace;
 import com.github.oDraco.entities.enums.DBCSkill;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBTFile;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,8 +33,8 @@ public abstract class PlayerManager {
      * @param player the player
      * @return the tp
      */
-    public static int getTP(Player player) {
-        return getPlayerPersisted(new NBTEntity(player)).getInteger("jrmcTpint");
+    public static int getTP(OfflinePlayer player) {
+        return getPlayerPersisted(player).getInteger("jrmcTpint");
     }
 
     /**
@@ -35,8 +43,13 @@ public abstract class PlayerManager {
      * @param player the player
      * @param amount the amount
      */
-    public static void setTP(Player player, int amount) {
-        getPlayerPersisted(new NBTEntity(player)).setInteger("jrmcTpint", amount);
+    public static void setTP(OfflinePlayer player, int amount) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        playerPersisted.setInteger("jrmcTpint", amount);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -46,17 +59,19 @@ public abstract class PlayerManager {
      * @param amount the amount
      * @return new TP
      */
-    public static int addTP(Player player, int amount) {
-        NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
+    public static int addTP(OfflinePlayer player, int amount) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
         int oldTp = playerPersisted.getInteger("jrmcTpint");
         long newTp = (long) oldTp + amount; // Cast to long to prevent overflow
 
-        if (newTp > Integer.MAX_VALUE) {
-            newTp = Integer.MAX_VALUE; // Set to MAX_VALUE if it exceeds
-        } else if (newTp < Integer.MIN_VALUE) {
-            newTp = Integer.MIN_VALUE; // Set to MIN_VALUE if it's less
-        }
+        newTp = Math.min(newTp, Integer.MAX_VALUE); // Set to MAX_VALUE if it exceeds
+        newTp = Math.max(newTp, Integer.MIN_VALUE); // Set to MIN_VALUE if it's less
         playerPersisted.setInteger("jrmcTpint", (int) newTp);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
+
         return (int) newTp;
     }
 
@@ -67,7 +82,7 @@ public abstract class PlayerManager {
      * @param amount the amount
      * @return new TP
      */
-    public static int addTP(Player player, long amount) {
+    public static int addTP(OfflinePlayer player, long amount) {
         if (amount > Integer.MAX_VALUE) return addTP(player, Integer.MAX_VALUE);
         if (amount < Integer.MIN_VALUE) return addTP(player, Integer.MIN_VALUE);
         return addTP(player, (int) amount);
@@ -80,8 +95,8 @@ public abstract class PlayerManager {
      * @param player    the player
      * @return the attr
      */
-    public static int getAttr(DBCAttribute attribute, Player player) {
-        NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
+    public static int getAttr(DBCAttribute attribute, OfflinePlayer player) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
         switch (attribute) {
             case STRENGTH:
                 return playerPersisted.getInteger("jrmcStrI");
@@ -106,29 +121,31 @@ public abstract class PlayerManager {
      * @param player       the player
      * @param newAttribute the new attribute
      */
-    public static void setAttr(DBCAttribute attribute, Player player, int newAttribute) {
-        NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
+    public static void setAttr(DBCAttribute attribute, OfflinePlayer player, int newAttribute) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
         switch (attribute) {
             case STRENGTH:
                 playerPersisted.setInteger("jrmcStrI", newAttribute);
-                return;
+                break;
             case DEXTERITY:
                 playerPersisted.setInteger("jrmcDexI", newAttribute);
-                return;
+                break;
             case CONSTITUTION:
                 playerPersisted.setInteger("jrmcCnsI", newAttribute);
-                return;
+                break;
             case WILL_POWER:
                 playerPersisted.setInteger("jrmcWilI", newAttribute);
-                return;
+                break;
             case MIND:
                 playerPersisted.setInteger("jrmcIntI", newAttribute);
-                return;
+                break;
             case SPIRIT:
                 playerPersisted.setInteger("jrmcCncI", newAttribute);
-                return;
+                break;
         }
-        throw new IllegalArgumentException("Invalid attribute argument! Valid attributes are: str,dex,con,wil,mnd,spi");
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -138,7 +155,7 @@ public abstract class PlayerManager {
      * @param player       the player
      * @param newAttribute the new attribute
      */
-    public static void setAttr(int attribute, Player player, int newAttribute) {
+    public static void setAttr(int attribute, OfflinePlayer player, int newAttribute) {
         if (attribute < 0 || attribute > 5) throw new InvalidParameterException("Attribute Index must be in range 0-5");
         setAttr(DBCAttribute.values()[attribute], player, newAttribute);
     }
@@ -150,7 +167,7 @@ public abstract class PlayerManager {
      * @param player    the player
      * @return the attr
      */
-    public static int getAttr(int attribute, Player player) {
+    public static int getAttr(int attribute, OfflinePlayer player) {
         if (attribute < 0 || attribute > 5) throw new InvalidParameterException("Attribute Index must be in range 0-5");
         return getAttr(DBCAttribute.values()[attribute], player);
     }
@@ -161,8 +178,8 @@ public abstract class PlayerManager {
      * @param player the player
      * @return attributes in an int[]
      */
-    public static int[] getAttributes(Player player) {
-        NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
+    public static int[] getAttributes(OfflinePlayer player) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
         int[] attr = new int[6];
         attr[0] = playerPersisted.getInteger("jrmcStrI");
         attr[1] = playerPersisted.getInteger("jrmcDexI");
@@ -179,15 +196,19 @@ public abstract class PlayerManager {
      * @param player the player
      * @param attr   attributes in an int[]
      */
-    public static void setAttributes(Player player, int[] attr) {
+    public static void setAttributes(OfflinePlayer player, int[] attr) {
         if (attr.length != 6) throw new InvalidParameterException("Attribute array length must be 6");
-        NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
+        NBTCompound playerPersisted = getPlayerPersisted(player);
         playerPersisted.setInteger("jrmcStrI", attr[0]);
         playerPersisted.setInteger("jrmcDexI", attr[1]);
         playerPersisted.setInteger("jrmcCnsI", attr[2]);
         playerPersisted.setInteger("jrmcWilI", attr[3]);
         playerPersisted.setInteger("jrmcIntI", attr[4]);
         playerPersisted.setInteger("jrmcCncI", attr[5]);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -196,8 +217,8 @@ public abstract class PlayerManager {
      * @param player the player
      * @return the dbc health
      */
-    public static int getDBCHealth(Player player) {
-        return getPlayerPersisted(new NBTEntity(player)).getInteger("jrmcBdy");
+    public static int getDBCHealth(OfflinePlayer player) {
+        return getPlayerPersisted(player).getInteger("jrmcBdy");
     }
 
     /**
@@ -206,8 +227,13 @@ public abstract class PlayerManager {
      * @param player    the player
      * @param newHealth the new health
      */
-    public static void setDBCHealth(Player player, int newHealth) {
-        getPlayerPersisted(new NBTEntity(player)).setInteger("jrmcBdy", newHealth);
+    public static void setDBCHealth(OfflinePlayer player, int newHealth) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        playerPersisted.setInteger("jrmcBdy", newHealth);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -216,8 +242,8 @@ public abstract class PlayerManager {
      * @param player the player
      * @return the dbc release
      */
-    public static byte getDBCRelease(Player player) {
-        return getPlayerPersisted(new NBTEntity(player)).getByte("jrmcRelease");
+    public static byte getDBCRelease(OfflinePlayer player) {
+        return getPlayerPersisted(player).getByte("jrmcRelease");
     }
 
     /**
@@ -226,8 +252,13 @@ public abstract class PlayerManager {
      * @param player     the player
      * @param newRelease the new release
      */
-    public static void setDBCRelease(Player player, byte newRelease) {
-        getPlayerPersisted(new NBTEntity(player)).setByte("jrmcRelease", newRelease);
+    public static void setDBCRelease(OfflinePlayer player, byte newRelease) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        playerPersisted.setByte("jrmcRelease", newRelease);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -236,8 +267,8 @@ public abstract class PlayerManager {
      * @param player the player
      * @return the dbc stamina
      */
-    public static int getDBCStamina(Player player) {
-        return getPlayerPersisted(new NBTEntity(player)).getInteger("jrmcStamina");
+    public static int getDBCStamina(OfflinePlayer player) {
+        return getPlayerPersisted(player).getInteger("jrmcStamina");
     }
 
     /**
@@ -246,8 +277,13 @@ public abstract class PlayerManager {
      * @param player     the player
      * @param newStamina the new stamina
      */
-    public static void setDBCStamina(Player player, int newStamina) {
-        getPlayerPersisted(new NBTEntity(player)).setInteger("jrmcStamina", newStamina);
+    public static void setDBCStamina(OfflinePlayer player, int newStamina) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        playerPersisted.setInteger("jrmcStamina", newStamina);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -256,8 +292,8 @@ public abstract class PlayerManager {
      * @param player the player
      * @return the dbc ki
      */
-    public static int getDBCKi(Player player) {
-        return getPlayerPersisted(new NBTEntity(player)).getInteger("jrmcEnrgy");
+    public static int getDBCKi(OfflinePlayer player) {
+        return getPlayerPersisted(player).getInteger("jrmcEnrgy");
     }
 
     /**
@@ -266,8 +302,13 @@ public abstract class PlayerManager {
      * @param player the player
      * @param newKi  the new ki
      */
-    public static void setDBCKi(Player player, int newKi) {
-        getPlayerPersisted(new NBTEntity(player)).setInteger("jrmcEnrgy", newKi);
+    public static void setDBCKi(OfflinePlayer player, int newKi) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        playerPersisted.setInteger("jrmcEnrgy", newKi);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -276,9 +317,14 @@ public abstract class PlayerManager {
      * @param player  the player
      * @param resetTP if player TP would be resetted
      */
-    public static void resetPlayer(Player player, boolean resetTP) {
+    public static void resetPlayer(OfflinePlayer player, boolean resetTP) {
         if (resetTP) setTP(player, 0);
-        getPlayerPersisted(new NBTEntity(player)).setByte("jrmcAccept", (byte) 0);
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        playerPersisted.setByte("jrmcAccept", (byte) 0);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -286,8 +332,13 @@ public abstract class PlayerManager {
      *
      * @param player the player
      */
-    public static void resetDBCSkills(Player player) {
-        getPlayerPersisted(new NBTEntity(player)).setString("jrmcSSlts", "");
+    public static void resetDBCSkills(OfflinePlayer player) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        playerPersisted.setString("jrmcSSlts", "");
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
 
@@ -298,9 +349,9 @@ public abstract class PlayerManager {
      * @param skill  the skill
      * @return the skill level, or 0 if the player doesn't have the skill.
      */
-    public static int getSkillLevel(Player player, DBCSkill skill) {
+    public static int getSkillLevel(OfflinePlayer player, DBCSkill skill) {
         int level = 0;
-        String skillsTxt = getPlayerPersisted(new NBTEntity(player)).getString("jrmcSSlts");
+        String skillsTxt = getPlayerPersisted(player).getString("jrmcSSlts");
         if (skillsTxt.contains(skill.getSymbol())) {
             for (String skillString : skillsTxt.split(",")) {
                 if (skillString.contains(skill.getSymbol()))
@@ -317,30 +368,34 @@ public abstract class PlayerManager {
      * @param skill  the skill
      * @param level  the level (if 0, removes the skill)
      */
-    public static void setSkillLevel(Player player, DBCSkill skill, int level) {
-        NBTCompound playerPersisted = getPlayerPersisted(new NBTEntity(player));
+    public static void setSkillLevel(OfflinePlayer player, DBCSkill skill, int level) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
         String skillsTxt = playerPersisted.getString("jrmcSSlts");
         String[] fields = skillsTxt.split(",");
         Set<String> newFields = new HashSet<>();
         for (String field : fields) {
             if (field.contains(skill.getSymbol())) {
-                if(level <= 0)
+                if (level <= 0)
                     continue;
                 field = skill.getSymbol() + (level - 1);
             }
             newFields.add(field);
         }
         playerPersisted.setString("jrmcSSlts", String.join(",", newFields));
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
      * Gets player persisted.
      *
-     * @param nbtEntity the nbt entity
+     * @param nbt the nbt entity
      * @return the player persisted
      */
-    public static NBTCompound getPlayerPersisted(NBTEntity nbtEntity) {
-        return nbtEntity.getCompound("ForgeData").getCompound("PlayerPersisted");
+    public static NBTCompound getPlayerPersisted(NBTCompound nbt) {
+        return nbt.getCompound("ForgeData").getCompound("PlayerPersisted");
     }
 
     /**
@@ -349,8 +404,15 @@ public abstract class PlayerManager {
      * @param player the player
      * @return the player persisted
      */
-    public static NBTCompound getPlayerPersisted(Player player) {
-        return getPlayerPersisted(new NBTEntity(player));
+    public static NBTCompound getPlayerPersisted(OfflinePlayer player) {
+        try {
+            return getPlayerPersisted(player.isOnline() ?
+                    new NBTEntity(player.getPlayer()) :
+                    NBTFile.readFrom(MiscUtils.getPlayerdata(player))
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -419,7 +481,7 @@ public abstract class PlayerManager {
      * @param addToBottom if the attribute should go to bottom/end (true) or top/start (true)
      * @param unrestrict  if true, allows to have 2+ bonuses with the same ID (can be buggy)
      */
-    public static void addBonusAttribute(Player player, AttributeBonus bonus, boolean addToBottom, boolean unrestrict) {
+    public static void addBonusAttribute(OfflinePlayer player, AttributeBonus bonus, boolean addToBottom, boolean unrestrict) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         String key = "jrmcAttrBonus" + bonus.getAttribute().getAcronym();
         String currentBonus = playerPersisted.getString(key);
@@ -433,6 +495,10 @@ public abstract class PlayerManager {
                 currentBonus + "|" + bonus :
                 bonus + "|" + currentBonus;
         playerPersisted.setString(key, currentBonus);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -441,7 +507,7 @@ public abstract class PlayerManager {
      * @param player the player
      * @param bonus  the bonus
      */
-    public static void addBonusAttribute(Player player, AttributeBonus bonus) {
+    public static void addBonusAttribute(OfflinePlayer player, AttributeBonus bonus) {
         addBonusAttribute(player, bonus, true, false);
     }
 
@@ -452,16 +518,28 @@ public abstract class PlayerManager {
      * @param bonus  the bonus
      * @return true, if the desired bonus is removed
      */
-    public static boolean removeBonusAttribute(Player player, AttributeBonus bonus) {
+    public static boolean removeBonusAttribute(OfflinePlayer player, AttributeBonus bonus) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         DBCAttribute attr = bonus.getAttribute();
         String key = "jrmcAttrBonus" + attr.getAcronym();
         String currentBonus = playerPersisted.getString(key);
-        if (currentBonus == null || currentBonus.isEmpty()) return false;
-        List<AttributeBonus> bonuses = Arrays.stream(currentBonus.split("\\|")).map(x -> AttributeBonus.fromString(attr, x)).collect(Collectors.toList());
+
+        if (currentBonus == null)
+            return false;
+
+        currentBonus = currentBonus.trim();
+        if (currentBonus.isEmpty())
+            return false;
+
+        List<AttributeBonus> bonuses = Arrays.stream(currentBonus.split("\\|")).map(x -> x.isEmpty() ? null : AttributeBonus.fromString(attr, x)).collect(Collectors.toList());
         if (!bonuses.remove(bonus)) return false;
         String newBonus = bonuses.stream().map(AttributeBonus::toString).collect(Collectors.joining("|"));
         playerPersisted.setString(key, newBonus);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
+
         return true;
     }
 
@@ -473,7 +551,7 @@ public abstract class PlayerManager {
      * @param bonusID the bonus ID (name)
      * @return true, if the desired bonus is removed
      */
-    public static boolean removeBonusAttribute(Player player, DBCAttribute attr, String bonusID) {
+    public static boolean removeBonusAttribute(OfflinePlayer player, DBCAttribute attr, String bonusID) {
         return removeBonusAttribute(player, new AttributeBonus(attr, bonusID, "+0"));
     }
 
@@ -485,7 +563,7 @@ public abstract class PlayerManager {
      * @param oldBonusID the old bonus id
      * @param newValue   the new bonus value
      */
-    public static void changeBonusAttribute(Player player, DBCAttribute attr, String oldBonusID, String newValue) {
+    public static void changeBonusAttribute(OfflinePlayer player, DBCAttribute attr, String oldBonusID, String newValue) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         String key = "jrmcAttrBonus" + attr.getAcronym();
         String currentBonus = playerPersisted.getString(key);
@@ -498,6 +576,10 @@ public abstract class PlayerManager {
         }
         String newBonus = bonuses.stream().map(AttributeBonus::toString).collect(Collectors.joining("|"));
         playerPersisted.setString(key, newBonus);
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
     }
 
     /**
@@ -508,7 +590,7 @@ public abstract class PlayerManager {
      * @param bonusID the bonus id
      * @return if player has the attribute bonus
      */
-    public static boolean hasBonusAttribute(Player player, DBCAttribute attr, String bonusID) {
+    public static boolean hasBonusAttribute(OfflinePlayer player, DBCAttribute attr, String bonusID) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         String currentBonus = playerPersisted.getString("jrmcAttrBonus" + attr.getAcronym());
         return currentBonus != null && !currentBonus.isEmpty() && currentBonus.contains(bonusID);
@@ -521,18 +603,110 @@ public abstract class PlayerManager {
      * @param player the player
      * @return the level
      */
-    public static int getLevel(Player player) {
+    public static int getLevel(OfflinePlayer player) {
         int i = Arrays.stream(getAttributes(player)).sum() / 5 - 11;
         return Math.max(i, 0);
+    }
+
+    /**
+     * Gets player's DBC race.
+     *
+     * @param player the player
+     * @return the race
+     */
+    public static DBCRace getDBCRace(OfflinePlayer player) {
+        return DBCRace.fromID(getPlayerPersisted(player).getByte("jrmcRace"));
+    }
+
+    /**
+     * Sets player's DBC race.
+     *
+     * @param player the player
+     * @param race   the race
+     */
+    public static void setDBCRace(OfflinePlayer player, DBCRace race) {
+        NBTCompound playerPersisted = getPlayerPersisted(player);
+        playerPersisted.setByte("jrmcRace", race.getID());
+
+        if (!player.isOnline()) {
+            savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
+        }
+    }
+
+    /**
+     * Gets dbc upgrade cost with a custom multiplier.
+     * Disclaimer, the code is from JRMCore.
+     *
+     * @param player     the player
+     * @param multiplier the multiplier
+     * @return the dbc upgrade cost
+     */
+    public static long getDBCUpgradeCost(OfflinePlayer player, int multiplier) {
+        int[] attributes = getAttributes(player);
+
+
+        // Part 1
+
+        double result = 0.0D;
+        for (int i = 0; i < 6; i++) {
+            if (JRMCoreConfig.AttributeUpgradeCost_AttributeMulti[i] > 0.0F) {
+                float attribute = attributes[i] * JRMCoreConfig.AttributeUpgradeCost_AttributeMulti[i];
+                result += attribute;
+                if (result <= 0.0D)
+                    return JRMCoreH.getMaxTP();
+            }
+        }
+        int att = (int) result;
+
+        // Part 2
+
+        if (att == 0) {
+            if (multiplier <= 1)
+                return JRMCoreH.getMaxTP();
+            return 0;
+        }
+        long attributeCost = 0;
+        for (int j = 0; j < multiplier; j++) {
+            int ac = JRMCoreH.attrCst(att++);
+            attributeCost += ac;
+            if (ac == 0)
+                return 0;
+        }
+        if (attributeCost <= 0)
+            return 0;
+        return attributeCost;
+    }
+
+
+    /**
+     * Gets a fusion member.
+     *
+     * @param player    the player
+     * @param spectator if true, will return the spectator player of the fusion
+     * @return the player, can be null
+     */
+    public static Player getFusionMember(OfflinePlayer player, boolean spectator) {
+        NBTCompound nbt = getPlayerPersisted(player);
+        String[] members = nbt.getString("jrmcFuzion").split(",");
+        return Bukkit.getPlayerExact(members[spectator ? 1 : 0]);
     }
 
     private static int removeStat(Player player, int amount, String tag) {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         int oldValue = playerPersisted.getInteger(tag);
         long newValue = (long) oldValue - amount;
-        if (newValue < 0) newValue = 0;
-        if (newValue > Integer.MAX_VALUE) newValue = Integer.MIN_VALUE;
+        newValue = Math.min(newValue, Integer.MAX_VALUE);
+        newValue = Math.max(newValue, 0);
         playerPersisted.setInteger(tag, Math.toIntExact(newValue));
         return Math.toIntExact(newValue);
+        
+    }
+
+    private static void savePlayerData(File playerdata, NBTCompound playerPersisted) {
+        try {
+            NBTFile.saveTo(playerdata, playerPersisted.getParent().getParent());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

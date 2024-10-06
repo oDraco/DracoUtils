@@ -1,25 +1,32 @@
 package com.github.oDraco.commands;
 
+import com.github.oDraco.DracoUtils;
 import com.github.oDraco.entities.enums.Rarity;
 import com.github.oDraco.entities.enums.Type;
 import com.github.oDraco.util.ItemUtils;
+import com.github.oDraco.util.SelectionManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.net.InetAddress;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 public class General implements CommandExecutor {
 
-    private static final String commandBaseUsage = "§cUse /dracoutils <item|material|format|unbreakable|localID|ip>";
+    private static final String commandBaseUsage = "§cUse /dracoutils <item|material|format|unbreakable|localID|name|lore|ip|select>";
     private static final String commandFormatUsage = "§cUse /dracoutils format <raridade> <categoria> <nome>";
 
 
@@ -39,13 +46,17 @@ public class General implements CommandExecutor {
         }
         Player player = (Player) commandSender;
         boolean advMaterial = false;
+        ItemStack hand = player.getItemInHand();
+        ItemMeta meta = null;
+        if(hand != null && hand.getType() != Material.AIR)
+            meta = hand.getItemMeta();
         switch (args[0].toLowerCase()) {
             case "item":
                 advMaterial = true;
             case "material":
                 TextComponent materialInfo = new TextComponent("§6§lINFO §a"+(advMaterial ? "Item":"Material")+": ");
-                TextComponent material = new TextComponent("§7§o"+player.getItemInHand().getType().name()+(advMaterial ? ":"+player.getItemInHand().getDurability(): ""));
-                material.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, player.getItemInHand().getType().name()+(advMaterial ? ":"+player.getItemInHand().getDurability(): "")));
+                TextComponent material = new TextComponent("§7§o"+ hand.getType().name()+(advMaterial ? ":"+ hand.getDurability(): ""));
+                material.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, hand.getType().name()+(advMaterial ? ":"+ hand.getDurability(): "")));
                 materialInfo.addExtra(material);
                 player.spigot().sendMessage(materialInfo);
                 return true;
@@ -61,6 +72,22 @@ public class General implements CommandExecutor {
                     commandSender.sendMessage(String.format("§7%s §7(§o%s§7)", t.getDescription(), t));
                 }
                 return true;
+            case "lore":
+                if(meta == null) return true;
+                commandSender.sendMessage("§6§lINFO §aLore do Item:");
+                meta.getLore().forEach(x -> {
+                    TextComponent line = new TextComponent("§e- §r" + x);
+                    line.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, x.replace('§','&')));
+                    player.spigot().sendMessage(line);
+                });
+                return true;
+            case "name":
+            case "nome":
+                if(meta == null) return true;
+                TextComponent name = new TextComponent("§6§lINFO §aNome do Item: §r" + meta.getDisplayName());
+                name.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, meta.getDisplayName().replace('§', '&')));
+                player.spigot().sendMessage(name);
+                return true;
             case "format":
                 return handleFormat(player, args);
             case "unbreaking":
@@ -74,17 +101,79 @@ public class General implements CommandExecutor {
                 } catch (UnknownHostException e) {
                     player.sendMessage("§4§lERRO! §cUm erro ocorreu ao buscar o IP do servidor: " + e.getMessage());
                 }
+            case "selecionar":
+            case "select":
+                boolean select = !SelectionManager.isSelecting(player);
+                if(select)
+                    player.sendMessage("§2§lSUCESSO! §aClique com o direito em uma entidade para seleciona-lá!");
+                else
+                    player.sendMessage("§2§lSUCESSO! §aSeleção de entidades desabilitada!");
+                SelectionManager.setSelecting(player, select);
+                return true;
+            case "biome":
+            case "bioma":
+                return handleBiome(player, args, label);
             default:
                 commandSender.sendMessage(commandBaseUsage);
         }
         return true;
     }
 
+    private boolean handleBiome(Player p, String[] args, String label) {
+        if(!DracoUtils.isWorldEditLoaded()) {
+            p.sendMessage("§4§lERRO! §cPara utilizar esta função é necessario o plugin §eWorldEdit§c!");
+            return true;
+        }
+        if(args.length < 2) {
+            p.sendMessage(String.format("§cUse /%s %s <list|set> [<biome>]", label, args[0]));
+            return true;
+        }
+        if(args[0].equalsIgnoreCase("list")) {
+            p.sendMessage("§6§lINFO! §aBiomas disponíveis: ");
+            p.sendMessage("§7"+ Arrays.toString(Biome.values()));
+            return true;
+        }
+        if(args[0].equalsIgnoreCase("set")) {
+            if(args.length < 3) {
+                p.sendMessage(String.format("§cUse /%s %s %s <biome>", label, args[0], args[1]));
+                return true;
+            }
+            Biome b;
+            try {
+                b = Biome.valueOf(args[2]);
+            }
+            catch (IllegalArgumentException e) {
+                p.sendMessage("§4§lERRO! §cBioma inexistente!");
+                return true;
+            }
+            // WIP
+            return true;
+        }
+        p.sendMessage(String.format("§cUse /%s %s <list|set> [<biome>]", label, args[0]));
+        return true;
+    }
+
     private boolean handleIP(Player player) throws UnknownHostException {
         Server server = Bukkit.getServer();
+        String IP;
+
+        try {
+            URL whatsmyip = new URL("https://checkip.amazonaws.com/");
+            BufferedReader ipReader = new BufferedReader(new InputStreamReader(whatsmyip.openConnection().getInputStream()));
+
+            IP = ipReader.readLine() + ":" + server.getPort();
+
+            ipReader.close();
+        }
+        catch (Exception e) {
+            player.sendMessage("§4§lERRO! §cUm erro ocorreu ao verificar o IP do servidor. Por-favor, verifique o console!");
+            e.printStackTrace();
+            return true;
+        }
+
         TextComponent ipInfo = new TextComponent("§6§lINFO §aIP & Porta do Servidor: ");
-        TextComponent ip = new TextComponent("§7§o"+ InetAddress.getLocalHost().getHostAddress()+":"+server.getPort());
-        ip.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, InetAddress.getLocalHost().getHostAddress()+":"+server.getPort()));
+        TextComponent ip = new TextComponent("§7§o"+ IP);
+        ip.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, IP));
         ipInfo.addExtra(ip);
 
         player.spigot().sendMessage(ipInfo);

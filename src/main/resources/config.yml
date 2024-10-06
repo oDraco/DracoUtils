@@ -1,0 +1,28 @@
+defaultItems: # Default items for some things
+  GUI:
+    filler:
+      item: 'STAINED_GLASS_PANE:15'
+      name: '&r'
+      lore: []
+      glow: true
+    pageInfo:
+      item: 'PAPER'
+      name: '&6&lINFO'
+      lore:
+        - ''
+        - '&e{current}&7/&6{max}'
+        - ''
+    nextPage:
+      item: 'ARROW'
+      name: '&9Próxima Página'
+      lore:
+        - ''
+        - '&7Clique aqui para ir para a próxima página'
+        - ''
+    backPage:
+      item: 'ARROW'
+      name: '&9Página Anterior'
+      lore:
+        - ''
+        - '&7Clique aqui para ir para a página anterior'
+        - ''

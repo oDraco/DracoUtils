@@ -6,7 +6,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -26,7 +25,12 @@ public abstract class DracoPlugin extends JavaPlugin {
         boolean allow = false;
 
         try {
-            String IP = InetAddress.getLocalHost().getHostAddress()+":"+getServer().getPort();
+            URL whatsmyip = new URL("https://checkip.amazonaws.com/");
+            BufferedReader ipReader = new BufferedReader(new InputStreamReader(whatsmyip.openConnection().getInputStream()));
+
+            String IP = ipReader.readLine()+":"+getServer().getPort();
+
+            ipReader.close();
             URL url = new URL(txt_url);
             URLConnection urlConnection = url.openConnection();
             try(BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()))) {
