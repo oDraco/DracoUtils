@@ -1,7 +1,6 @@
 package com.github.oDraco.commands;
 
 import com.github.oDraco.DracoUtils;
-import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

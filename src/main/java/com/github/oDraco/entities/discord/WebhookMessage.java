@@ -1,6 +1,5 @@
 package com.github.oDraco.entities.discord;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.Getter;
