@@ -2,25 +2,32 @@ package com.github.oDraco;
 
 import com.github.oDraco.commands.General;
 import com.github.oDraco.commands.Light;
+import com.github.oDraco.commands.ResourcePack;
 import com.github.oDraco.commands.Trash;
 import com.github.oDraco.commands.tabCompleters.GeneralTab;
+import com.github.oDraco.entities.DracoPlugin;
 import com.github.oDraco.entities.listeners.InventoryListener;
 import com.github.oDraco.entities.listeners.MiscListener;
 import com.github.oDraco.entities.listeners.QuitListener;
 import com.github.oDraco.util.ItemUtils;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 
-public class DracoUtils extends JavaPlugin {
+public class DracoUtils extends DracoPlugin {
 
+    @Getter
     private static DracoUtils instance;
 
+    @Getter
+    private static boolean dracoCoreLoaded = false;
+    @Getter
     private static boolean worldEditLoaded = false;
 
+    @Getter
     private final static HashMap<String, ItemStack> defaultItems = new HashMap<>();
 
     @Override
@@ -33,12 +40,19 @@ public class DracoUtils extends JavaPlugin {
 
         worldEditLoaded = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
 
+        try {
+            Class.forName("com.github.oDraco.DracoCore.Main");
+            dracoCoreLoaded = true;
+        } catch (Exception ignored) {};
+
         getCommand("dracoutils").setExecutor(new General());
         getCommand("dracoutils").setTabCompleter(new GeneralTab());
 
         getCommand("luz").setExecutor(new Light());
 
         getCommand("lixeira").setExecutor(new Trash());
+
+        getCommand("resourcepack").setExecutor(new ResourcePack());
 
         Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
         Bukkit.getPluginManager().registerEvents(new MiscListener(), this);
@@ -53,14 +67,6 @@ public class DracoUtils extends JavaPlugin {
                 "                                                  \n" +
                 "                                                  ");
         getLogger().info("Iniciado com sucesso! Versão: " + getDescription().getVersion());
-    }
-
-    public static boolean isWorldEditLoaded() {
-        return worldEditLoaded;
-    }
-
-    public static DracoUtils getInstance() {
-        return instance;
     }
 
     private static void loadDefaultItems() {
@@ -79,7 +85,4 @@ public class DracoUtils extends JavaPlugin {
         });
     }
 
-    public static HashMap<String, ItemStack> getDefaultItems() {
-        return defaultItems;
-    }
 }

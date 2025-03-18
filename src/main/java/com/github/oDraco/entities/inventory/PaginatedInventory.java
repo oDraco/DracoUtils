@@ -2,6 +2,7 @@ package com.github.oDraco.entities.inventory;
 
 import com.github.oDraco.DracoUtils;
 import com.github.oDraco.util.ItemUtils;
+import lombok.Getter;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -10,12 +11,16 @@ import java.util.HashMap;
 
 public class PaginatedInventory extends SimpleInventory {
 
+    @Getter
     protected final ArrayList<IIcon> icons = new ArrayList<>();
 
+    @Getter
     private int currentPage = 0;
+    @Getter
     private int maxPages = 1;
     private int perPage;
 
+    @Getter
     private boolean fancy = false;
 
     public PaginatedInventory(String title, int size) {
@@ -33,10 +38,6 @@ public class PaginatedInventory extends SimpleInventory {
         perPage = inv.getSize() - 9;
     }
 
-    public ArrayList<IIcon> getIcons() {
-        return icons;
-    }
-
     public void addIcon(IIcon icon) {
         icons.add(icon);
         updateMaxPages();
@@ -45,18 +46,6 @@ public class PaginatedInventory extends SimpleInventory {
     public void removeIcon(IIcon icon) {
         icons.remove(icon);
         updateMaxPages();
-    }
-
-    public int getMaxPages() {
-        return maxPages;
-    }
-
-    public int getCurrentPage() {
-        return currentPage;
-    }
-
-    public boolean isFancy() {
-        return fancy;
     }
 
     public void setFancy(boolean fancy) {
@@ -113,14 +102,21 @@ public class PaginatedInventory extends SimpleInventory {
                 setItem(invIndex+row*9, icon);
                 addedItems++;
                 invIndex++;
-                if(addedItems % 7 == 0)
+                if(addedItems % 7 == 0) {
                     row++;
+                    invIndex-=7;
+                }
             }
         }
 
         // Update info
         currentPage = newPage;
         updatePageInfo();
+    }
+
+    @Override
+    public void updateInventory() {
+        setCurrentPage(getCurrentPage());
     }
 
     private void updatePageInfo() {

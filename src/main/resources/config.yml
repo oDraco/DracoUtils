@@ -26,3 +26,27 @@ defaultItems: # Default items for some things
         - ''
         - '&7Clique aqui para ir para a página anterior'
         - ''
+
+messages:
+  leakPermission: "&4&lERRO! &cVocê não possui permissão para utilizar este comando!"
+  onlyPlayer: "&4&lERRO! &cApenas jogadores podem utilizar este comando!"
+  playerNotFound: "&4&lERRO! &cJogador não encontrado!"
+
+# This only need to be changed if you want to translate something
+time:
+  month: "mês"
+  months: "meses"
+  week: "semana"
+  weeks: "semanas"
+  day: "dia"
+  days: "dias"
+  hour: "hora"
+  hours: "horas"
+  minute: "minuto"
+  minutes: "minutos"
+  second: "segundo"
+  seconds: "segundos"
+  and: " e "
+
+# ResourcePack URL for /texture command
+resourcePackURL: ""

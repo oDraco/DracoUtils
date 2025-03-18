@@ -322,9 +322,13 @@ public abstract class PlayerManager {
         NBTCompound playerPersisted = getPlayerPersisted(player);
         playerPersisted.setByte("jrmcAccept", (byte) 0);
 
+        playerPersisted.setInteger("jrmcState", 0);
+        playerPersisted.setInteger("jrmcState2", 0);
+
         if (!player.isOnline()) {
             savePlayerData(MiscUtils.getPlayerdata(player), playerPersisted);
         }
+        setDBCRelease(player, (byte) 0);
     }
 
     /**
@@ -635,7 +639,7 @@ public abstract class PlayerManager {
 
     /**
      * Gets dbc upgrade cost with a custom multiplier.
-     * Disclaimer, the code is from JRMCore.
+     * Disclaimer, the code is from JRMCore. ( I just removed the cap O.O)
      *
      * @param player     the player
      * @param multiplier the multiplier
@@ -686,9 +690,38 @@ public abstract class PlayerManager {
      * @return the player, can be null
      */
     public static Player getFusionMember(OfflinePlayer player, boolean spectator) {
+        return getFusionMembers(player)[spectator ? 1 : 0];
+    }
+
+
+    /**
+     * Get fusion members for determined player.
+     *
+     * @param player the player participating in a fusion
+     * @return a player array with both players in the fusion (First one is the controller)
+     */
+    public static Player[] getFusionMembers(OfflinePlayer player) {
         NBTCompound nbt = getPlayerPersisted(player);
         String[] members = nbt.getString("jrmcFuzion").split(",");
-        return Bukkit.getPlayerExact(members[spectator ? 1 : 0]);
+        Player[] players = new Player[2];
+        for (int i = 0; i < 2; i++) {
+            players[i] = Bukkit.getPlayerExact(members[i]);
+        }
+        return players;
+    }
+
+    /**
+     * Unfuse player.
+     *
+     * @param player the player
+     */
+    public static void unfusePlayer(OfflinePlayer player) {
+        for (Player p : getFusionMembers(player)) {
+            NBTCompound nbt = getPlayerPersisted(p);
+            nbt.setString("jrmcFuzion", "");
+            if(!p.isOnline())
+                savePlayerData(MiscUtils.getPlayerdata(p), nbt);
+        }
     }
 
     private static int removeStat(Player player, int amount, String tag) {

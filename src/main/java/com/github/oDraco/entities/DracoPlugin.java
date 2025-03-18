@@ -52,4 +52,9 @@ public abstract class DracoPlugin extends JavaPlugin {
 
         return allow;
     }
+
+    public boolean debugEnabled() {
+        return (boolean) getConfig().get("DEBUG", false);
+    }
+
 }

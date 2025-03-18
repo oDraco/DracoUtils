@@ -1,8 +1,11 @@
 package com.github.oDraco.commands;
 
+import com.github.oDraco.DracoUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -10,12 +13,13 @@ import org.bukkit.potion.PotionEffectType;
 public class Light implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        FileConfiguration cfg = DracoUtils.getInstance().getConfig();
         if(!(sender instanceof Player)) {
-            sender.sendMessage("ERRO! Somente jogadores podem utilizar este comando!");
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("messages.onlyPlayer")));
             return true;
         }
         if(!sender.hasPermission("draco.utils.luz")) {
-            sender.sendMessage("§4§lERRO! §cVocê não possui permissão para utilizar este comando!");
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("messages.leakPermission")));
             return true;
         }
         Player p = (Player) sender;

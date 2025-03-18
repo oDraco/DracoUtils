@@ -4,6 +4,8 @@ version: 1.2
 description: Utils plugin I've made to use for my others plugins ;)
 depend:
   - NBTAPI
+softdepend:
+  - WorldEdit
 commands:
   dracoutils:
     description: Main command
@@ -20,3 +22,9 @@ commands:
     aliases:
       - lixo
       - trash
+  resourcepack:
+    description: Downloads the texture pack
+    aliases:
+      - texture
+      - textura
+      - texturepack

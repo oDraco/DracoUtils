@@ -1,14 +1,14 @@
 package com.github.oDraco.util;
 
+import com.github.oDraco.DracoUtils;
 import com.github.oDraco.entities.AttributeWrapper;
 import com.github.oDraco.entities.enums.*;
 import de.tr7zw.nbtapi.*;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,6 +19,9 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * The type Item utils.
+ */
 public abstract class ItemUtils {
 
     /**
@@ -28,6 +31,7 @@ public abstract class ItemUtils {
      * @param name   the name
      * @param rarity the rarity
      * @param type   the type
+     * @param additionalLore additional lore for the item
      * @return the formatted item
      */
     public static ItemStack formatItem(@Nonnull ItemStack item, @Nonnull String name, @Nonnull Rarity rarity, @Nonnull Type type, String... additionalLore) {
@@ -282,10 +286,14 @@ public abstract class ItemUtils {
      */
     public static ItemStack applyGlow(ItemStack item) {
         NBTItem i = new NBTItem(item);
-        NBTCompoundList ench = i.getCompoundList("ench");
-        NBTListCompound compound = ench.addCompound();
-        compound.setShort("id", (short)127);
-        compound.setShort("lvl", (short)0);
+        if (DracoUtils.isDracoCoreLoaded()) {
+            i.setBoolean("Glow", true);
+        } else {
+            NBTCompoundList ench = i.getCompoundList("ench");
+            NBTListCompound compound = ench.addCompound();
+            compound.setShort("id", (short) 127);
+            compound.setShort("lvl", (short) 0);
+        }
         return i.getItem();
     }
 
@@ -312,7 +320,7 @@ public abstract class ItemUtils {
      * @param player the player
      * @return the mannequin
      */
-    public static ItemStack getMannequin(Player player) {
+    public static ItemStack getMannequin(OfflinePlayer player) {
         ItemStack i = new ItemStack(Material.matchMaterial("ARMOURERSWORKSHOP_BLOCKMANNEQUIN"));
         NBTItem nbt = new NBTItem(i);
         NBTCompound comp = nbt.addCompound("owner");
@@ -342,7 +350,7 @@ public abstract class ItemUtils {
      * @param player the player
      * @return the skull
      */
-    public static ItemStack getSkull(Player player) {
+    public static ItemStack getSkull(OfflinePlayer player) {
         ItemStack i = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         SkullMeta meta = (SkullMeta) i.getItemMeta();
         meta.setOwner(player.getName());
@@ -392,6 +400,35 @@ public abstract class ItemUtils {
         meta.setLore(meta.getLore().stream().map(x -> x.replace(oldValue, newValue)).collect(Collectors.toList()));
         i.setItemMeta(meta);
 
+        return i;
+    }
+
+
+    /**
+     * Gets the localized name/display name of an item stack.
+     *
+     * @param item the item
+     * @return the name
+     */
+    public static String getName(@Nonnull ItemStack item) {
+        return CraftItemStack.asNMSCopy(item).getName();
+    }
+
+    /**
+     * Gets an itemstack from a config section.
+     * The config section needs to have the following entries: "item","name" & "lore"
+     *
+     * @param section the section
+     * @return the item stack
+     */
+    public static ItemStack fromConfigSection(ConfigurationSection section) {
+        ItemStack i = formatItem(
+                parseItem(section.getString("item")),
+                section.getString("name"),
+                section.getStringList("lore")
+        );
+        if(section.contains("glow") && section.getBoolean("glow"))
+            i=applyGlow(i);
         return i;
     }
 }
