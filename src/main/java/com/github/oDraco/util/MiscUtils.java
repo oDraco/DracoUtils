@@ -61,8 +61,8 @@ public class MiscUtils {
      */
     public static Vector vectorFromString(String input) {
         String[] fields = input.split(",");
-        if(fields.length != 3)
-            throw new IllegalArgumentException("Invalid format! Valid format is: 0,0,0");
+        if(fields.length < 3)
+            throw new IllegalArgumentException("Invalid format! Valid format is: 0,0,0. Input: " + input);
         double[] vectorValues = new double[3];
         for (int i = 0; i < 3; i++) {
             vectorValues[i] = Double.parseDouble(fields[i]);
@@ -116,6 +116,16 @@ public class MiscUtils {
         }
         return true;
     }
+
+    public static boolean anyNull(Object... obj) {
+        for (Object o : obj) {
+            if(o == null)
+                return true;
+        }
+        return false;
+    }
+
+
 
     // https://github.com/Kqnth/Java-HWID/blob/master/HWID.java
     public static String getHWID() {

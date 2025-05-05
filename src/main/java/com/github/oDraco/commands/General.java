@@ -1,10 +1,12 @@
 package com.github.oDraco.commands;
 
+import com.github.oDraco.DracoCore.api.Misc;
 import com.github.oDraco.DracoUtils;
 import com.github.oDraco.entities.enums.Rarity;
 import com.github.oDraco.entities.enums.Type;
 import com.github.oDraco.util.ItemUtils;
 import com.github.oDraco.util.MiscUtils;
+import com.github.oDraco.util.PlayerManager;
 import com.github.oDraco.util.SelectionManager;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
@@ -18,6 +20,8 @@ import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -30,10 +34,11 @@ import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class General implements CommandExecutor {
 
-    private static final String commandBaseUsage = "§cUse /dracoutils <info|material|format|unbreakable|localID|name|lore|ip|select|item|rotate|time|biome>";
+    private static final String commandBaseUsage = "§cUse /dracoutils <info|material|format|unbreakable|localID|name|lore|ip|select|item|rotate|time|biome|entityinfo>";
     private static final String commandFormatUsage = "§cUse /dracoutils format <raridade> <categoria> <nome>";
 
 
@@ -138,6 +143,16 @@ public class General implements CommandExecutor {
                 return handleTime(sender);
             case "hwid":
                 return handleHWID(sender);
+            case "entityinfo":
+            case "entity":
+                if (!isPlayer) return sendOnlyPlayer(sender);
+                return handleEntityInfo((Player) sender);
+            case "infinitepower":
+                if (!DracoUtils.isDracoCoreLoaded()) {
+                    PlayerManager.sendConfigMessage(sender, "messages.dracoCoreNeeded");
+                    return true;
+                }
+                return handleInfinitePower(sender, label, args);
             case "test":
                 if (!isPlayer) return sendOnlyPlayer(sender);
                 return handleTest((Player) sender);
@@ -148,6 +163,59 @@ public class General implements CommandExecutor {
     }
 
     private static boolean handleTest(Player p) {
+        return true;
+    }
+
+    private static boolean handleInfinitePower(CommandSender sender, String label, String[] args) {
+        if(args.length < 3) {
+            PlayerManager.sendMessage(sender, String.format("&cUse /%s %s <add|remove|clear> <UUID>", label, args[0]));
+            return true;
+        }
+        if (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("limpar")) {
+            Misc.getInfinitePower().clear();
+            PlayerManager.sendConfigMessage(sender, "messages.successOperation");
+            return true;
+        }
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(args[2]);
+        } catch (Exception e) {
+            PlayerManager.sendConfigMessage(sender, "messages.invalidUUID");
+            return true;
+        }
+        boolean add = false;
+        switch (args[1].toLowerCase()) {
+            case "add":
+            case "adicionar":
+                add = true;
+            case "remove":
+            case "remover":
+                if(add)
+                    Misc.addInfinitePower(uuid);
+                else
+                    Misc.getInfinitePower().remove(uuid);
+                PlayerManager.sendConfigMessage(sender, "messages.successOperation");
+                return true;
+            default:
+                PlayerManager.sendMessage(sender, String.format("&cUse /%s %s <add|remove|clear> <UUID>", label, args[0]));
+                return true;
+        }
+    }
+
+    private static boolean handleEntityInfo(Player p) {
+        Entity e = SelectionManager.getSelection(p);
+        if(e == null) {
+            PlayerManager.sendConfigMessage(p, "messages.selectionNotFound");
+            return true;
+        }
+        PlayerManager.sendMessage(p, "&m-+-------------------+-");
+        PlayerManager.sendMessage(p, "&7Name: "+e.getName());
+        if(e instanceof LivingEntity)
+            PlayerManager.sendMessage(p, "&7Custom Name: "+((LivingEntity) e).getCustomName());
+        PlayerManager.sendMessage(p, "&7UUID: "+e.getUniqueId());
+        if(e instanceof LivingEntity)
+            PlayerManager.sendMessage(p, String.format("&7Health: %.2f/%.2f", ((LivingEntity) e).getHealth(), ((LivingEntity) e).getMaxHealth()));
+        PlayerManager.sendMessage(p, "&m-+-------------------+-");
         return true;
     }
 

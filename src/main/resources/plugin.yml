@@ -6,6 +6,7 @@ depend:
   - NBTAPI
 softdepend:
   - WorldEdit
+  - mactionbarapi
 commands:
   dracoutils:
     description: Main command

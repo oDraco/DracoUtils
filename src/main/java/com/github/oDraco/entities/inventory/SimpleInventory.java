@@ -1,5 +1,6 @@
 package com.github.oDraco.entities.inventory;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -13,6 +14,7 @@ public class SimpleInventory implements InventoryHolder {
 
     protected final Inventory inv;
 
+    @Getter
     protected final Map<Integer, IIcon> iconMap = new HashMap<>();
 
     public SimpleInventory(String title, int size) {
@@ -38,10 +40,6 @@ public class SimpleInventory implements InventoryHolder {
 
     public IIcon getIcon(int slot) {
         return iconMap.get(slot);
-    }
-
-    public Map<Integer, IIcon> getIconMap() {
-        return iconMap;
     }
 
     public void updateInventory() {

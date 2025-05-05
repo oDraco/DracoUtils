@@ -23,9 +23,13 @@ public class DracoUtils extends DracoPlugin {
     private static DracoUtils instance;
 
     @Getter
+    private static boolean dracoFLibLoaded = false;
+    @Getter
     private static boolean dracoCoreLoaded = false;
     @Getter
     private static boolean worldEditLoaded = false;
+    @Getter
+    private static boolean mActionBarLoaded = false;
 
     @Getter
     private final static HashMap<String, ItemStack> defaultItems = new HashMap<>();
@@ -39,11 +43,16 @@ public class DracoUtils extends DracoPlugin {
         loadDefaultItems();
 
         worldEditLoaded = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
+        mActionBarLoaded = Bukkit.getPluginManager().isPluginEnabled("mactionbarapi");
 
         try {
             Class.forName("com.github.oDraco.DracoCore.Main");
             dracoCoreLoaded = true;
-        } catch (Exception ignored) {};
+        } catch (Exception ignored) {}
+        try {
+            Class.forName("com.github.oDraco.DracoFLib.DracoFLib");
+            dracoFLibLoaded = true;
+        } catch (Exception ignored) {}
 
         getCommand("dracoutils").setExecutor(new General());
         getCommand("dracoutils").setTabCompleter(new GeneralTab());

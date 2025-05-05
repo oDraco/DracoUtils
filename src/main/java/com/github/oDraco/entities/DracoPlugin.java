@@ -20,6 +20,8 @@ public abstract class DracoPlugin extends JavaPlugin {
         return true;
     }
 
+    // If you know how to read this you probably know how to do plugins similar to mine
+    // Believe in yourself ;)
     protected final boolean isAllowed(@NotNull String txt_url) {
         if(txt_url.isEmpty()) return true;
         boolean allow = false;
@@ -54,7 +56,7 @@ public abstract class DracoPlugin extends JavaPlugin {
     }
 
     public boolean debugEnabled() {
-        return (boolean) getConfig().get("DEBUG", false);
+        return (boolean) getConfig().get("DEBUG", false) || (boolean) getConfig().get("debug", false);
     }
 
 }

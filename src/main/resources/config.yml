@@ -31,6 +31,10 @@ messages:
   leakPermission: "&4&lERRO! &cVocê não possui permissão para utilizar este comando!"
   onlyPlayer: "&4&lERRO! &cApenas jogadores podem utilizar este comando!"
   playerNotFound: "&4&lERRO! &cJogador não encontrado!"
+  selectionNotFound: "&4&lERRO! &cVocê não possui nenhuma entidade selecionada!"
+  invalidUUID: "&4&lERRO! &cUUID inválido!"
+  successOperation: "&2&lSUCESSO! &aOperação realizada com sucesso!"
+  dracoCoreNeeded: "&4&lERRO! &cEsta função necessita do mod DracoCore!"
 
 # This only need to be changed if you want to translate something
 time:

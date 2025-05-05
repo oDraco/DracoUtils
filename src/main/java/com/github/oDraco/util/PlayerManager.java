@@ -2,6 +2,7 @@ package com.github.oDraco.util;
 
 import JinRyuu.JRMCore.JRMCoreConfig;
 import JinRyuu.JRMCore.JRMCoreH;
+import com.github.oDraco.DracoUtils;
 import com.github.oDraco.entities.AttributeBonus;
 import com.github.oDraco.entities.enums.DBCAttribute;
 import com.github.oDraco.entities.enums.DBCRace;
@@ -9,10 +10,17 @@ import com.github.oDraco.entities.enums.DBCSkill;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTEntity;
 import de.tr7zw.nbtapi.NBTFile;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -26,6 +34,76 @@ import java.util.stream.Collectors;
  * The type Player manager.
  */
 public abstract class PlayerManager {
+
+    public static void sendConfigMessage(CommandSender sender, String key) {
+        sendConfigMessage(sender, key, DracoUtils.getInstance());
+    }
+
+    public static void sendConfigMessage(CommandSender sender, String key, JavaPlugin plugin) {
+        sendConfigMessage(sender, key, plugin.getConfig());
+    }
+
+    public static void sendConfigMessage(CommandSender sender, String key, FileConfiguration config) {
+        sendMessage(sender, config.getString(key));
+    }
+
+    /**
+     * Sends a colored message to the target
+     *
+     * @param target the receiver of the message
+     * @param message message, if null the message isn't send
+     */
+    public static void sendMessage(CommandSender target, @Nullable String message) {
+        sendMessage(target, message,false, true);
+    }
+
+    /**
+     * Sends a message to the target
+     *
+     * @param target the receiver of the message
+     * @param message message, if null or empty (depending on the sendEmpty value) the message isn't send
+     * @param sendEmpty if true, empty messages are sent
+     * @param colored if the message should be colored, defaults to true
+     */
+    public static void sendMessage(CommandSender target, @Nullable String message, boolean sendEmpty, boolean colored) {
+        if(message == null)
+            return;
+        if(message.isEmpty() && !sendEmpty)
+            return;
+        if(colored)
+            message = ChatColor.translateAlternateColorCodes('&', message);
+        for (String s : message.split("\n")) {
+            target.sendMessage(s);
+        }
+    }
+
+    /**
+     * Sends an action bar to the specified player
+     *
+     * @param player the target
+     * @param message the message, if null the message isn't send
+     */
+    public static void sendActionBar(Player player, @Nullable String message) {
+        sendActionBar(player, message, true);
+    }
+
+    /**
+     * Sends an action bar to the specified player
+     *
+     * @param player the target
+     * @param message the message, if null the message isn't send
+     * @param colored if the message should be colored, defaults to true
+     */
+    public static void sendActionBar(Player player, @Nullable String message, boolean colored) {
+        if(message == null)
+            return;
+        if(colored)
+            message = ChatColor.translateAlternateColorCodes('&', message);
+        if(DracoUtils.isMActionBarLoaded())
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format("mactionbarapi send %s %s", player.getName(), message));
+        else
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+    }
 
     /**
      * Gets tp.
@@ -704,9 +782,10 @@ public abstract class PlayerManager {
         NBTCompound nbt = getPlayerPersisted(player);
         String[] members = nbt.getString("jrmcFuzion").split(",");
         Player[] players = new Player[2];
-        for (int i = 0; i < 2; i++) {
-            players[i] = Bukkit.getPlayerExact(members[i]);
-        }
+        if(members.length >= 2)
+            for (int i = 0; i < 2; i++) {
+                players[i] = Bukkit.getPlayerExact(members[i]);
+            }
         return players;
     }
 
@@ -717,6 +796,8 @@ public abstract class PlayerManager {
      */
     public static void unfusePlayer(OfflinePlayer player) {
         for (Player p : getFusionMembers(player)) {
+            if(p == null)
+                continue;
             NBTCompound nbt = getPlayerPersisted(p);
             nbt.setString("jrmcFuzion", "");
             if(!p.isOnline())

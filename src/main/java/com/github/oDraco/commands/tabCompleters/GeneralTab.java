@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class GeneralTab implements TabCompleter {
 
-    private final static String[] COMPLETIONS = new String[]{"ip","hwid","time","rotate","biome","format", "material", "unbreakable", "rarity", "type", "localID", "item", "select", "name", "lore", "info"};
+    private final static String[] COMPLETIONS = new String[]{"entityInfo","ip","hwid","time","rotate","biome","format", "material", "unbreakable", "rarity", "type", "localID", "item", "select", "name", "lore", "info"};
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {

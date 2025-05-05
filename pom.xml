@@ -53,8 +53,9 @@
             <scope>provided</scope>
         </dependency>
         <!-- Also need:
-        MohistMC (1.7.10)
+        Cauldron
         Spigot (For NMS)
+        NecroTempus
 
         -->
     </dependencies>

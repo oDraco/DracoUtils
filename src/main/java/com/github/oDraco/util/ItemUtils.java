@@ -411,7 +411,7 @@ public abstract class ItemUtils {
      * @return the name
      */
     public static String getName(@Nonnull ItemStack item) {
-        return CraftItemStack.asNMSCopy(item).getName();
+        return CraftItemStack.asNMSCopy(item).s();
     }
 
     /**
