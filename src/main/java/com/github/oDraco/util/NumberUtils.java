@@ -58,4 +58,9 @@ public class NumberUtils {
 
         return 0;
     }
+
+    public static String punctuate(Number number) {
+        return DECIMAL_FORMAT.format(number);
+    }
+
 }

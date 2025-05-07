@@ -125,8 +125,6 @@ public class MiscUtils {
         return false;
     }
 
-
-
     // https://github.com/Kqnth/Java-HWID/blob/master/HWID.java
     public static String getHWID() {
         try {

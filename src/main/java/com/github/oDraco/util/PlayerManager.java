@@ -24,10 +24,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,16 +32,33 @@ import java.util.stream.Collectors;
  */
 public abstract class PlayerManager {
 
+
+
     public static void sendConfigMessage(CommandSender sender, String key) {
         sendConfigMessage(sender, key, DracoUtils.getInstance());
     }
 
+    public static void sendConfigMessage(CommandSender sender, String key, Map<String, String> replaces) {
+        sendConfigMessage(sender, key, DracoUtils.getInstance(), replaces);
+    }
+
     public static void sendConfigMessage(CommandSender sender, String key, JavaPlugin plugin) {
-        sendConfigMessage(sender, key, plugin.getConfig());
+        sendConfigMessage(sender, key, plugin.getConfig(), null);
+    }
+
+    public static void sendConfigMessage(CommandSender sender, String key, JavaPlugin plugin, Map<String, String> replaces) {
+        sendConfigMessage(sender, key, plugin.getConfig(), replaces);
     }
 
     public static void sendConfigMessage(CommandSender sender, String key, FileConfiguration config) {
-        sendMessage(sender, config.getString(key));
+        sendConfigMessage(sender, key, config, null);
+    }
+
+    public static void sendConfigMessage(CommandSender sender, String key, FileConfiguration config, @Nullable Map<String, String> replaces) {
+        if(config.isList(key))
+            sendMessage(sender, true, true, replaces, config.getStringList(key).toArray(new String[0]));
+        else
+            sendMessage(sender, true, true, replaces, config.getString(key));
     }
 
     /**
@@ -58,6 +72,16 @@ public abstract class PlayerManager {
     }
 
     /**
+     * Sends multiple colored messages to the target
+     *
+     * @param target the receiver of the message
+     * @param messages message list, if null the message isn't send
+     */
+    public static void sendMessage(CommandSender target, @Nullable String... messages) {
+        sendMessage(target, false, true,null, messages);
+    }
+
+    /**
      * Sends a message to the target
      *
      * @param target the receiver of the message
@@ -66,23 +90,28 @@ public abstract class PlayerManager {
      * @param colored if the message should be colored, defaults to true
      */
     public static void sendMessage(CommandSender target, @Nullable String message, boolean sendEmpty, boolean colored) {
+        sendMessage(target, sendEmpty, colored,null, message != null ? message.split("\n") : null);
+    }
+
+
+    public static void sendMessage(CommandSender target, boolean sendEmpty, boolean colored, @Nullable Map<String, String> replaces, @Nullable String... message) {
         if(message == null)
             return;
-        if(message.isEmpty() && !sendEmpty)
-            return;
-        if(colored)
-            message = ChatColor.translateAlternateColorCodes('&', message);
-        for (String s : message.split("\n")) {
-            target.sendMessage(s);
+        for (String s : message) {
+            if(s.isEmpty() && !sendEmpty)
+                continue;
+            if(replaces != null)
+                s = StringUtils.replace(s, replaces);
+            target.sendMessage(colored ? ChatColor.translateAlternateColorCodes('&', s) : s);
         }
     }
 
-    /**
-     * Sends an action bar to the specified player
-     *
-     * @param player the target
-     * @param message the message, if null the message isn't send
-     */
+        /**
+         * Sends an action bar to the specified player
+         *
+         * @param player the target
+         * @param message the message, if null the message isn't send
+         */
     public static void sendActionBar(Player player, @Nullable String message) {
         sendActionBar(player, message, true);
     }
