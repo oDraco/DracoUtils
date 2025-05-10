@@ -13,7 +13,8 @@ public class BasicIconImpl implements IIcon {
 
 
     @Override
-    public void onClick(InventoryClickEvent event) {}
+    public void onClick(InventoryClickEvent event) {
+    }
 
     @Override
     public ItemStack getIcon() {

@@ -32,7 +32,7 @@ public class SelectionManager {
     }
 
     public static void setSelecting(Player player, boolean selecting) {
-        if(selecting)
+        if (selecting)
             SelectionManager.selecting.add(player.getUniqueId());
         else
             SelectionManager.selecting.remove(player.getUniqueId());

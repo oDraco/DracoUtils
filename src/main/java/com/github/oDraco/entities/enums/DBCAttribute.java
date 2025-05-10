@@ -18,6 +18,24 @@ public enum DBCAttribute {
         this.name = name;
     }
 
+    public static DBCAttribute fromString(String input) {
+        DBCAttribute attr = fromAcronym(input);
+        if (attr == null)
+            try {
+                attr = valueOf(input.toUpperCase());
+            } catch (Exception e) {
+                return null;
+            }
+        return attr;
+    }
+
+    public static DBCAttribute fromAcronym(String input) {
+        for (DBCAttribute value : DBCAttribute.values()) {
+            if (value.getAcronym().equalsIgnoreCase(input)) return value;
+        }
+        return null;
+    }
+
     public String getAcronym() {
         return acronym;
     }
@@ -28,24 +46,5 @@ public enum DBCAttribute {
 
     public int getIndex() {
         return index;
-    }
-
-    public static DBCAttribute fromString(String input) {
-        DBCAttribute attr = fromAcronym(input);
-        if(attr == null)
-            try {
-                attr = valueOf(input.toUpperCase());
-            }
-            catch (Exception e) {
-                return null;
-            }
-        return attr;
-    }
-
-    public static DBCAttribute fromAcronym(String input) {
-        for (DBCAttribute value : DBCAttribute.values()) {
-            if(value.getAcronym().equalsIgnoreCase(input)) return value;
-        }
-        return null;
     }
 }

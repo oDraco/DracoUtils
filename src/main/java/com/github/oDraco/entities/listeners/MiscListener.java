@@ -12,10 +12,10 @@ public class MiscListener implements Listener {
     @EventHandler
     public void onRightClick(PlayerInteractEntityEvent e) {
         Player p = e.getPlayer();
-        if(!SelectionManager.isSelecting(p)) return;
+        if (!SelectionManager.isSelecting(p)) return;
         SelectionManager.setSelection(p, e.getRightClicked());
         SelectionManager.setSelecting(p, false);
         String name = e.getRightClicked() instanceof LivingEntity && ((LivingEntity) e.getRightClicked()).getCustomName() != null ? ((LivingEntity) e.getRightClicked()).getCustomName() : e.getRightClicked().getType().name();
-        p.sendMessage("§6§lINFO! §aVocê selecionou a entidade §7§o"+name);
+        p.sendMessage("§6§lINFO! §aVocê selecionou a entidade §7§o" + name);
     }
 }

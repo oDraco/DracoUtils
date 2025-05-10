@@ -16,16 +16,14 @@ import java.util.Map;
 public class SimpleInventory implements InventoryHolder {
 
     protected final Inventory inv;
-
+    @Getter
+    protected final Map<Integer, IIcon> iconMap = new HashMap<>();
     @Getter
     @Setter
     protected Sound sound;
     @Getter
     @Setter
     protected boolean playSound = true;
-
-    @Getter
-    protected final Map<Integer, IIcon> iconMap = new HashMap<>();
 
     public SimpleInventory(String title, int size) {
         inv = Bukkit.createInventory(this, size, title);
@@ -37,10 +35,10 @@ public class SimpleInventory implements InventoryHolder {
     }
 
     public void setItem(int slot, IIcon icon) {
-        if(slot < 0)
+        if (slot < 0)
             return;
         iconMap.put(slot, icon);
-        if(icon instanceof IIconAsync)
+        if (icon instanceof IIconAsync)
             ((IIconAsync) icon).getIconAsync().thenAccept(x -> inv.setItem(slot, x));
         else
             inv.setItem(slot, icon.getIcon());
@@ -58,12 +56,12 @@ public class SimpleInventory implements InventoryHolder {
     public void updateInventory() {
         inv.clear();
         for (int i = 0; i < inv.getSize(); i++) {
-            if(iconMap.containsKey(i)) {
+            if (iconMap.containsKey(i)) {
                 IIcon icon = iconMap.get(i);
                 inv.setItem(i, icon.getIcon());
-                if(icon instanceof IIconAsync) {
+                if (icon instanceof IIconAsync) {
                     int finalI = i;
-                    ((IIconAsync) icon).getIconAsync().thenAccept(x -> inv.setItem(finalI,x));
+                    ((IIconAsync) icon).getIconAsync().thenAccept(x -> inv.setItem(finalI, x));
                 }
             }
         }
@@ -77,7 +75,7 @@ public class SimpleInventory implements InventoryHolder {
     public void openInventory(Player player) {
         player.closeInventory();
         player.openInventory(getInventory());
-        if(playSound)
+        if (playSound)
             player.playSound(player.getLocation(), sound == null ? Sound.NOTE_PLING : sound, 1.0f, 1.0f);
     }
 

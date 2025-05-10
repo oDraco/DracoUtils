@@ -15,20 +15,20 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void inventoryDrag(InventoryDragEvent e) {
         InventoryHolder holder = e.getInventory().getHolder();
-        if(holder instanceof SimpleInventory)
+        if (holder instanceof SimpleInventory)
             e.setCancelled(true);
     }
 
     @EventHandler
     public void inventoryClick(InventoryClickEvent e) {
-        if(e.getClickedInventory() == null) return;
-        if(!(e.getClickedInventory().getHolder() instanceof SimpleInventory)) return;
+        if (e.getClickedInventory() == null) return;
+        if (!(e.getClickedInventory().getHolder() instanceof SimpleInventory)) return;
 
         e.setCancelled(true);
 
         SimpleInventory holder = (SimpleInventory) e.getClickedInventory().getHolder();
         Map<Integer, IIcon> iconMap = holder.getIconMap();
-        if(iconMap.containsKey(e.getSlot()))
+        if (iconMap.containsKey(e.getSlot()))
             iconMap.get(e.getSlot()).onClick(e);
     }
 }

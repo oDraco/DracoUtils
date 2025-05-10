@@ -25,7 +25,7 @@ public class PaginatedInventory extends SimpleInventory {
 
     public PaginatedInventory(String title, int size) {
         super(title, size);
-        if(size <= 9)
+        if (size <= 9)
             throw new IllegalArgumentException("Size can't be equal or less than 9");
         perPage = inv.getSize() - 9;
     }
@@ -33,7 +33,7 @@ public class PaginatedInventory extends SimpleInventory {
     @Deprecated
     public PaginatedInventory(Inventory inventory) {
         super(inventory);
-        if(inventory.getSize() <= 9)
+        if (inventory.getSize() <= 9)
             throw new IllegalArgumentException("Size can't be equal or less than 9");
         perPage = inv.getSize() - 9;
     }
@@ -49,10 +49,10 @@ public class PaginatedInventory extends SimpleInventory {
     }
 
     public void setFancy(boolean fancy) {
-        if(fancy && inv.getSize() < 36)
+        if (fancy && inv.getSize() < 36)
             throw new IllegalStateException("Fancy inventories need at least a size of 36");
         this.fancy = fancy;
-        perPage = fancy ? (inv.getSize()/9-3)*7 : inv.getSize() - 9;
+        perPage = fancy ? (inv.getSize() / 9 - 3) * 7 : inv.getSize() - 9;
     }
 
     public void setCurrentPage(int newPage) {
@@ -65,10 +65,10 @@ public class PaginatedInventory extends SimpleInventory {
         clear();
 
         // Put the fillers icons
-        int start = inv.getSize()-9;
+        int start = inv.getSize() - 9;
         final IIcon filler = new BasicIconImpl(DracoUtils.getDefaultItems().get("filler"));
-        for(int i=0; i<9; i++) {
-            setItem(start+i, filler);
+        for (int i = 0; i < 9; i++) {
+            setItem(start + i, filler);
         }
 
         // Put the new icons
@@ -76,7 +76,7 @@ public class PaginatedInventory extends SimpleInventory {
         int invIndex, addedItems = 0;
 
 
-        if(!isFancy()) { // I think that is best to use 2 separate FORs than add another if in one?
+        if (!isFancy()) { // I think that is best to use 2 separate FORs than add another if in one?
             invIndex = 0;
             for (IIcon icon : icons) {
                 if (startIndex > 0) {
@@ -99,12 +99,12 @@ public class PaginatedInventory extends SimpleInventory {
                 }
                 if (addedItems >= perPage)
                     break;
-                setItem(invIndex+row*9, icon);
+                setItem(invIndex + row * 9, icon);
                 addedItems++;
                 invIndex++;
-                if(addedItems % 7 == 0) {
+                if (addedItems % 7 == 0) {
                     row++;
-                    invIndex-=7;
+                    invIndex -= 7;
                 }
             }
         }

@@ -27,7 +27,7 @@ public class CmdIconImpl implements IIcon {
     @Override
     public void onClick(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if(closeGUI)
+        if (closeGUI)
             p.closeInventory();
         p.performCommand(command.replace("{player}", p.getName()));
     }

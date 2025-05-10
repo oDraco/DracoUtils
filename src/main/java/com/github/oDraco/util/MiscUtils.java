@@ -39,15 +39,15 @@ public class MiscUtils {
         ArrayList<Integer> weights = new ArrayList<>();
 
         int total = elements.values().stream().reduce(0, Integer::sum);
-        int random = (int) Math.round(Math.random()*total);
+        int random = (int) Math.round(Math.random() * total);
 
-        if(total <= 0)
+        if (total <= 0)
             return null;
 
         int cursor = 0;
         for (Map.Entry<T, Integer> entry : elements.entrySet()) {
-            cursor+=entry.getValue();
-            if(cursor >= random)
+            cursor += entry.getValue();
+            if (cursor >= random)
                 return entry.getKey();
         }
 
@@ -57,12 +57,12 @@ public class MiscUtils {
     public static <T> T getRandomByWeight(List<T> elements, List<Integer> weights) {
         int total = weights.stream().reduce(0, Integer::sum);
 
-        int random = (int) Math.round(Math.random()*total);
+        int random = (int) Math.round(Math.random() * total);
 
         int cursor = 0;
-        for(int i=0; i<weights.size(); i++) {
-            cursor+=weights.get(i);
-            if(cursor >= random) return elements.get(i);
+        for (int i = 0; i < weights.size(); i++) {
+            cursor += weights.get(i);
+            if (cursor >= random) return elements.get(i);
         }
 
         return null;
@@ -77,7 +77,7 @@ public class MiscUtils {
         if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
             InputStream resource = plugin.getResource(fileName);
-            if(resource != null)
+            if (resource != null)
                 plugin.saveResource(fileName, false);
             else if (create)
                 try {
@@ -85,7 +85,7 @@ public class MiscUtils {
                 } catch (Exception e) {
                     DracoUtils instance = DracoUtils.getInstance();
                     instance.getLogger().severe("An error occurred while writing a YAML file: " + e.getMessage());
-                    if(instance.debugEnabled())
+                    if (instance.debugEnabled())
                         e.printStackTrace();
                 }
         }
@@ -100,7 +100,7 @@ public class MiscUtils {
      */
     public static Vector vectorFromString(String input) {
         String[] fields = input.split(",");
-        if(fields.length < 3)
+        if (fields.length < 3)
             throw new IllegalArgumentException("Invalid format! Valid format is: 0,0,0. Input: " + input);
         double[] vectorValues = new double[3];
         for (int i = 0; i < 3; i++) {
@@ -110,7 +110,7 @@ public class MiscUtils {
     }
 
     public static File getPlayerdata(OfflinePlayer player) {
-        return new File("world/playerdata/"+player.getUniqueId()+".dat");
+        return new File("world/playerdata/" + player.getUniqueId() + ".dat");
     }
 
     public static boolean canBeFormattedToSeconds(String in) {
@@ -124,7 +124,7 @@ public class MiscUtils {
         while (matcher.find()) {
             String group = matcher.group();
             char c = group.toCharArray()[group.length() - 1];
-            seconds += TIME_VALUE.get(c)*Integer.parseInt(group.substring(0, group.length()-1));
+            seconds += TIME_VALUE.get(c) * Integer.parseInt(group.substring(0, group.length() - 1));
         }
         return seconds <= 0 ? -1L : seconds;
     }
@@ -139,7 +139,7 @@ public class MiscUtils {
             long amount = seconds / timeUnits[i];
             if (amount > 0) {
                 seconds -= amount * timeUnits[i];
-                if(sb.length() > 0)
+                if (sb.length() > 0)
                     sb.append(config.getString("time.and"));
                 sb.append(amount).append(" ")
                         .append(config.getString("time." + (amount > 1 ? timeLabels[i] + "s" : timeLabels[i])));
@@ -150,7 +150,7 @@ public class MiscUtils {
 
     public static boolean allNull(Object... obj) {
         for (Object o : obj) {
-            if(o != null)
+            if (o != null)
                 return false;
         }
         return true;
@@ -158,7 +158,7 @@ public class MiscUtils {
 
     public static boolean anyNull(Object... obj) {
         for (Object o : obj) {
-            if(o == null)
+            if (o == null)
                 return true;
         }
         return false;
@@ -168,7 +168,7 @@ public class MiscUtils {
         ConfigurationSection dayOfWeek = DracoUtils.getCachedConfig().getConfigurationSection("dayOfWeek");
         String trim = input.trim();
         for (String key : dayOfWeek.getKeys(false)) {
-            if(trim.equalsIgnoreCase(dayOfWeek.getString(key)))
+            if (trim.equalsIgnoreCase(dayOfWeek.getString(key)))
                 return DayOfWeek.valueOf(key);
         }
         try {
@@ -176,8 +176,11 @@ public class MiscUtils {
         } catch (Exception e) {
             try {
                 return DayOfWeek.of(Integer.parseInt(trim));
-            } catch (Exception ignored) {};
-        };
+            } catch (Exception ignored) {
+            }
+            ;
+        }
+        ;
 
         return null;
     }

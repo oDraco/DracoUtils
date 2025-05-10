@@ -15,13 +15,13 @@ public class NumberUtils {
     private static final Pattern NUMBER_PATTERN = Pattern.compile("((^\\d{1,3})([.][\\d+]{1,2})?)(\\D+$)?");
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
-    private static final List<String> FORMATS = Arrays.asList("","K","M","B","T","Q","QQ","S","SS","OC","N","D","UN","DD","TR","QT","QN");
+    private static final List<String> FORMATS = Arrays.asList("", "K", "M", "B", "T", "Q", "QQ", "S", "SS", "OC", "N", "D", "UN", "DD", "TR", "QT", "QN");
 
     public static String format(double number) {
         int base = (int) Math.log10(number);
         int index = base / 3;
 
-        if(index < 0) {
+        if (index < 0) {
             index = 0;
         }
 
@@ -36,13 +36,13 @@ public class NumberUtils {
     }
 
     public static double unformat(String string) {
-        if(!isFormatted(string)) {
+        if (!isFormatted(string)) {
             throw new IllegalArgumentException("the value " + string + " is not in a valid format");
         }
 
         try {
             Matcher matcher = NUMBER_PATTERN.matcher(string);
-            if(matcher.find()) {
+            if (matcher.find()) {
                 String value = matcher.group(1);
                 String format = matcher.group(4);
 

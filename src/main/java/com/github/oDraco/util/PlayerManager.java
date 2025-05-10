@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 public abstract class PlayerManager {
 
 
-
     public static void sendConfigMessage(CommandSender sender, String key) {
         sendConfigMessage(sender, key, DracoUtils.getCachedConfig());
     }
@@ -55,7 +54,7 @@ public abstract class PlayerManager {
     }
 
     public static void sendConfigMessage(CommandSender sender, String key, FileConfiguration config, @Nullable Map<String, String> replaces) {
-        if(config.isList(key))
+        if (config.isList(key))
             sendMessage(sender, true, true, replaces, config.getStringList(key).toArray(new String[0]));
         else
             sendMessage(sender, true, true, replaces, config.getString(key));
@@ -64,43 +63,43 @@ public abstract class PlayerManager {
     /**
      * Sends a colored message to the target
      *
-     * @param target the receiver of the message
+     * @param target  the receiver of the message
      * @param message message, if null the message isn't send
      */
     public static void sendMessage(CommandSender target, @Nullable String message) {
-        sendMessage(target, message,false, true);
+        sendMessage(target, message, false, true);
     }
 
     /**
      * Sends multiple colored messages to the target
      *
-     * @param target the receiver of the message
+     * @param target   the receiver of the message
      * @param messages message list, if null the message isn't send
      */
     public static void sendMessage(CommandSender target, @Nullable String... messages) {
-        sendMessage(target, false, true,null, messages);
+        sendMessage(target, false, true, null, messages);
     }
 
     /**
      * Sends a message to the target
      *
-     * @param target the receiver of the message
-     * @param message message, if null or empty (depending on the sendEmpty value) the message isn't send
+     * @param target    the receiver of the message
+     * @param message   message, if null or empty (depending on the sendEmpty value) the message isn't send
      * @param sendEmpty if true, empty messages are sent
-     * @param colored if the message should be colored, defaults to true
+     * @param colored   if the message should be colored, defaults to true
      */
     public static void sendMessage(CommandSender target, @Nullable String message, boolean sendEmpty, boolean colored) {
-        sendMessage(target, sendEmpty, colored,null, message != null ? message.split("\n") : null);
+        sendMessage(target, sendEmpty, colored, null, message != null ? message.split("\n") : null);
     }
 
 
     public static void sendMessage(CommandSender target, boolean sendEmpty, boolean colored, @Nullable Map<String, String> replaces, @Nullable String... message) {
-        if(message == null)
+        if (message == null)
             return;
         for (String s : message) {
-            if(s.isEmpty() && !sendEmpty)
+            if (s.isEmpty() && !sendEmpty)
                 continue;
-            if(replaces != null)
+            if (replaces != null)
                 s = StringUtils.replace(s, replaces);
             target.sendMessage(colored ? ChatColor.translateAlternateColorCodes('&', s) : s);
         }
@@ -109,7 +108,7 @@ public abstract class PlayerManager {
     /**
      * Sends an action bar to the specified player
      *
-     * @param player the target
+     * @param player  the target
      * @param message the message, if null the message isn't send
      */
     public static void sendActionBar(Player player, @Nullable String message) {
@@ -119,16 +118,16 @@ public abstract class PlayerManager {
     /**
      * Sends an action bar to the specified player
      *
-     * @param player the target
+     * @param player  the target
      * @param message the message, if null the message isn't send
      * @param colored if the message should be colored, defaults to true
      */
     public static void sendActionBar(Player player, @Nullable String message, boolean colored) {
-        if(message == null)
+        if (message == null)
             return;
-        if(colored)
+        if (colored)
             message = ChatColor.translateAlternateColorCodes('&', message);
-        if(DracoUtils.isMActionBarLoaded())
+        if (DracoUtils.isMActionBarLoaded())
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format("mactionbarapi send %s %s", player.getName(), message));
         else
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
@@ -811,7 +810,7 @@ public abstract class PlayerManager {
         NBTCompound nbt = getPlayerPersisted(player);
         String[] members = nbt.getString("jrmcFuzion").split(",");
         Player[] players = new Player[2];
-        if(members.length >= 2)
+        if (members.length >= 2)
             for (int i = 0; i < 2; i++) {
                 players[i] = Bukkit.getPlayerExact(members[i]);
             }
@@ -825,11 +824,11 @@ public abstract class PlayerManager {
      */
     public static void unfusePlayer(OfflinePlayer player) {
         for (Player p : getFusionMembers(player)) {
-            if(p == null)
+            if (p == null)
                 continue;
             NBTCompound nbt = getPlayerPersisted(p);
             nbt.setString("jrmcFuzion", "");
-            if(!p.isOnline())
+            if (!p.isOnline())
                 savePlayerData(MiscUtils.getPlayerdata(p), nbt);
         }
     }
@@ -842,7 +841,7 @@ public abstract class PlayerManager {
         newValue = Math.max(newValue, 0);
         playerPersisted.setInteger(tag, Math.toIntExact(newValue));
         return Math.toIntExact(newValue);
-        
+
     }
 
     private static void savePlayerData(File playerdata, NBTCompound playerPersisted) {

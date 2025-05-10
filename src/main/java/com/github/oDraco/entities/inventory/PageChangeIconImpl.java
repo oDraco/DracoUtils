@@ -17,7 +17,7 @@ public class PageChangeIconImpl implements IIcon {
 
     @Override
     public void onClick(InventoryClickEvent e) {
-        parent.setCurrentPage(parent.getCurrentPage()+value);
+        parent.setCurrentPage(parent.getCurrentPage() + value);
     }
 
     @Override

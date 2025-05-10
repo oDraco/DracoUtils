@@ -14,11 +14,11 @@ public class Light implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         FileConfiguration cfg = DracoUtils.getCachedConfig();
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("messages.onlyPlayer")));
             return true;
         }
-        if(!sender.hasPermission("draco.utils.luz")) {
+        if (!sender.hasPermission("draco.utils.luz")) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("messages.leakPermission")));
             return true;
         }

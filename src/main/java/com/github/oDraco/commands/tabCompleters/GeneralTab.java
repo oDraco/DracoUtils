@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class GeneralTab implements TabCompleter {
 
-    private final static String[] COMPLETIONS = new String[]{"entityInfo","ip","hwid","time","rotate","biome","format", "material", "unbreakable", "rarity", "type", "localID", "item", "select", "name", "lore", "info"};
+    private final static String[] COMPLETIONS = new String[]{"entityInfo", "ip", "hwid", "time", "rotate", "biome", "format", "material", "unbreakable", "rarity", "type", "localID", "item", "select", "name", "lore", "info"};
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
@@ -28,22 +28,22 @@ public class GeneralTab implements TabCompleter {
         if (args.length == 1) {
             return StringUtil.copyPartialMatches(args[0], Arrays.asList(COMPLETIONS), new ArrayList<>());
         }
-        if(args[0].equalsIgnoreCase("format")) {
-            if(args.length == 2)
-                return StringUtil.copyPartialMatches(args[args.length-1], Arrays.stream(Rarity.values()).map(Enum::name).collect(Collectors.toList()), new ArrayList<>());
-            if(args.length == 3)
-                return StringUtil.copyPartialMatches(args[args.length-1], Arrays.stream(Type.values()).map(Enum::name).collect(Collectors.toList()), new ArrayList<>());
+        if (args[0].equalsIgnoreCase("format")) {
+            if (args.length == 2)
+                return StringUtil.copyPartialMatches(args[args.length - 1], Arrays.stream(Rarity.values()).map(Enum::name).collect(Collectors.toList()), new ArrayList<>());
+            if (args.length == 3)
+                return StringUtil.copyPartialMatches(args[args.length - 1], Arrays.stream(Type.values()).map(Enum::name).collect(Collectors.toList()), new ArrayList<>());
         }
-        if(args[0].equalsIgnoreCase("biome")) {
-            if(args.length == 2)
-                return StringUtil.copyPartialMatches(args[args.length-1], Arrays.asList("list", "set"), new ArrayList<>());
-            if(args.length == 3 && args[1].equalsIgnoreCase("set"))
-                return StringUtil.copyPartialMatches(args[args.length-1], Arrays.stream(Biome.values()).map(Enum::name).collect(Collectors.toList()), new ArrayList<>());
+        if (args[0].equalsIgnoreCase("biome")) {
+            if (args.length == 2)
+                return StringUtil.copyPartialMatches(args[args.length - 1], Arrays.asList("list", "set"), new ArrayList<>());
+            if (args.length == 3 && args[1].equalsIgnoreCase("set"))
+                return StringUtil.copyPartialMatches(args[args.length - 1], Arrays.stream(Biome.values()).map(Enum::name).collect(Collectors.toList()), new ArrayList<>());
         }
-        if(args[0].equalsIgnoreCase("item")) {
-            if(args.length == 3 && args[1].equalsIgnoreCase("give")) {
-                File itemFolder = new File(DracoUtils.getInstance().getDataFolder() + File.separator+"items"+File.separator);
-                if(itemFolder.list() == null)
+        if (args[0].equalsIgnoreCase("item")) {
+            if (args.length == 3 && args[1].equalsIgnoreCase("give")) {
+                File itemFolder = new File(DracoUtils.getInstance().getDataFolder() + File.separator + "items" + File.separator);
+                if (itemFolder.list() == null)
                     return null;
                 return StringUtil.copyPartialMatches(args[args.length - 1], Arrays.stream(itemFolder.list()).filter(x -> x.endsWith(".nbt")).map(x -> x.replace(".nbt", "")).collect(Collectors.toSet()), new ArrayList<>());
             }

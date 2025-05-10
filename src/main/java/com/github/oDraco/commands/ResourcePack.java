@@ -13,25 +13,25 @@ public class ResourcePack implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         FileConfiguration cfg = DracoUtils.getCachedConfig();
-        if(!(sender instanceof Player) && (args == null || args.length == 0)) {
-            sender.sendMessage("§cUse /"+label+" <player> [<url>]");
+        if (!(sender instanceof Player) && (args == null || args.length == 0)) {
+            sender.sendMessage("§cUse /" + label + " <player> [<url>]");
             return true;
         }
-        if(!sender.hasPermission("draco.utils.resource")) {
+        if (!sender.hasPermission("draco.utils.resource")) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("messages.leakPermission")));
             return true;
         }
         Player target;
-        if(args != null && args.length > 0 && sender.hasPermission("draco.utils.resource.others")) {
+        if (args != null && args.length > 0 && sender.hasPermission("draco.utils.resource.others")) {
             target = Bukkit.getPlayerExact(args[0]);
         } else {
-            if(!(sender instanceof Player)) {
+            if (!(sender instanceof Player)) {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("messages.onlyPlayer")));
                 return true;
             }
             target = (Player) sender;
         }
-        if(target == null) {
+        if (target == null) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("messages.playerNotFound")));
             return true;
         }

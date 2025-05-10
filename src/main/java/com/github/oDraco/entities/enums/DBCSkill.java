@@ -28,10 +28,6 @@ public enum DBCSkill {
         this.symbol = symbol;
     }
 
-    public String getSymbol() {
-        return symbol;
-    }
-
     /**
      * Returns the skill by its symbol
      * Ignores case.
@@ -41,8 +37,12 @@ public enum DBCSkill {
      */
     public static DBCSkill fromSymbol(String symbol) {
         for (DBCSkill skill : DBCSkill.values()) {
-            if(skill.symbol.equalsIgnoreCase(symbol)) return skill;
+            if (skill.symbol.equalsIgnoreCase(symbol)) return skill;
         }
         return null;
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 }

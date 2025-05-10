@@ -20,40 +20,40 @@ public class Embed {
 
     public JsonObject getJsonObject() {
         JsonObject obj = new JsonObject();
-        if(!MiscUtils.allNull(authorName, authorURL, authorIconURL)) {
+        if (!MiscUtils.allNull(authorName, authorURL, authorIconURL)) {
             JsonObject authorObj = new JsonObject();
-            if(authorName != null)
+            if (authorName != null)
                 authorObj.addProperty("name", authorName);
-            if(authorURL != null)
+            if (authorURL != null)
                 authorObj.addProperty("url", authorURL);
-            if(authorIconURL != null)
+            if (authorIconURL != null)
                 authorObj.addProperty("icon_url", authorIconURL);
             obj.add("author", authorObj);
         }
-        if(bodyTitle != null)
+        if (bodyTitle != null)
             obj.addProperty("title", bodyTitle);
-        if(bodyDescription != null)
+        if (bodyDescription != null)
             obj.addProperty("description", bodyDescription);
-        if(bodyURL != null)
+        if (bodyURL != null)
             obj.addProperty("url", bodyURL);
-        if(color != null)
+        if (color != null)
             obj.addProperty("color", color);
-        if((!MiscUtils.allNull(footerText, footerURL))) {
+        if ((!MiscUtils.allNull(footerText, footerURL))) {
             JsonObject footerObj = new JsonObject();
-            if(footerText != null)
+            if (footerText != null)
                 footerObj.addProperty("text", footerText);
-            if(footerURL != null)
+            if (footerURL != null)
                 footerObj.addProperty("icon_url", footerURL);
             obj.add("footer", footerObj);
         }
-        if(timestamp != null)
+        if (timestamp != null)
             obj.addProperty("timestamp", timestamp.toString());
-        if(imageURL != null) {
+        if (imageURL != null) {
             JsonObject imageObj = new JsonObject();
             imageObj.addProperty("url", imageURL);
             obj.add("image", imageObj);
         }
-        if(thumbnailURL != null) {
+        if (thumbnailURL != null) {
             JsonObject thumbnailObj = new JsonObject();
             thumbnailObj.addProperty("url", thumbnailURL);
             obj.add("thumbnail", thumbnailObj);

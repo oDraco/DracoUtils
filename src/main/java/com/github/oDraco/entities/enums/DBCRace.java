@@ -14,14 +14,14 @@ public enum DBCRace {
         ID = id;
     }
 
-    public byte getID() {
-        return ID;
-    }
-
     public static DBCRace fromID(byte ID) {
         for (DBCRace value : values()) {
-            if(value.getID() == ID) return value;
+            if (value.getID() == ID) return value;
         }
         return null;
+    }
+
+    public byte getID() {
+        return ID;
     }
 }

@@ -12,7 +12,7 @@ import java.net.URLConnection;
 public abstract class DracoPlugin extends JavaPlugin {
 
     protected final boolean handleCheck(@NotNull String url) {
-        if(!isAllowed(url)) {
+        if (!isAllowed(url)) {
             getLogger().warning("Servidor não encontrado na whitelist! Plugin desligando...");
             Bukkit.getPluginManager().disablePlugin(this);
             return false;
@@ -23,22 +23,22 @@ public abstract class DracoPlugin extends JavaPlugin {
     // If you know how to read this you probably know how to do plugins similar to mine
     // Believe in yourself ;)
     protected final boolean isAllowed(@NotNull String txt_url) {
-        if(txt_url.isEmpty()) return true;
+        if (txt_url.isEmpty()) return true;
         boolean allow = false;
 
         try {
             URL whatsmyip = new URL("https://checkip.amazonaws.com/");
             BufferedReader ipReader = new BufferedReader(new InputStreamReader(whatsmyip.openConnection().getInputStream()));
 
-            String IP = ipReader.readLine()+":"+getServer().getPort();
+            String IP = ipReader.readLine() + ":" + getServer().getPort();
 
             ipReader.close();
             URL url = new URL(txt_url);
             URLConnection urlConnection = url.openConnection();
-            try(BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()))) {
                 String line = br.readLine();
-                while(line != null && !line.isEmpty()) {
-                    if(IP.equals(line)) {
+                while (line != null && !line.isEmpty()) {
+                    if (IP.equals(line)) {
                         allow = true;
                         break;
                     }

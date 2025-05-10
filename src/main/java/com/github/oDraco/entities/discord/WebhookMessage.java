@@ -12,11 +12,12 @@ import java.util.List;
 @Getter
 public class WebhookMessage {
 
+    private final List<Embed> embeds = new ArrayList<>();
     @Setter
     private String content = null;
-    private final List<Embed> embeds = new ArrayList<>();
 
-    public WebhookMessage() {}
+    public WebhookMessage() {
+    }
 
     public WebhookMessage(String content, Collection<? extends Embed> embeds) {
         this.content = content;

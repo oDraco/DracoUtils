@@ -11,15 +11,15 @@ public enum AttributeOperation {
         this.ID = ID;
     }
 
-    public int getID() {
-        return ID;
-    }
-
     public static AttributeOperation fromID(int id) {
         for (AttributeOperation op : values()) {
-            if(op.getID() == id)
+            if (op.getID() == id)
                 return op;
         }
         return null;
+    }
+
+    public int getID() {
+        return ID;
     }
 }

@@ -20,11 +20,11 @@ import java.util.HashMap;
 public class DracoUtils extends DracoPlugin {
 
     @Getter
+    private final static HashMap<String, ItemStack> defaultItems = new HashMap<>();
+    @Getter
     private static DracoUtils instance;
-
     @Getter
     private static FileConfiguration cachedConfig;
-
     @Getter
     private static boolean dracoFLibLoaded = false;
     @Getter
@@ -34,8 +34,15 @@ public class DracoUtils extends DracoPlugin {
     @Getter
     private static boolean mActionBarLoaded = false;
 
-    @Getter
-    private final static HashMap<String, ItemStack> defaultItems = new HashMap<>();
+    private static void loadDefaultItems() {
+        FileConfiguration config = getCachedConfig();
+
+        config.getConfigurationSection("defaultItems.GUI").getKeys(false).forEach(x -> {
+            String key = "defaultItems.GUI." + x;
+            ItemStack i = ItemUtils.fromConfigSection(config.getConfigurationSection(key));
+            defaultItems.put(x, i);
+        });
+    }
 
     @Override
     public void onEnable() {
@@ -46,18 +53,19 @@ public class DracoUtils extends DracoPlugin {
         loadDefaultItems();
 
 
-
         worldEditLoaded = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
         mActionBarLoaded = Bukkit.getPluginManager().isPluginEnabled("mactionbarapi");
 
         try {
             Class.forName("com.github.oDraco.DracoCore.Main");
             dracoCoreLoaded = true;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         try {
             Class.forName("com.github.oDraco.DracoFLib.DracoFLib");
             dracoFLibLoaded = true;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         getCommand("dracoutils").setExecutor(new General());
         getCommand("dracoutils").setTabCompleter(new GeneralTab());
@@ -81,16 +89,6 @@ public class DracoUtils extends DracoPlugin {
                 "                                                  \n" +
                 "                                                  ");
         getLogger().info("Iniciado com sucesso! Versão: " + getDescription().getVersion());
-    }
-
-    private static void loadDefaultItems() {
-        FileConfiguration config = getCachedConfig();
-
-        config.getConfigurationSection("defaultItems.GUI").getKeys(false).forEach(x -> {
-            String key = "defaultItems.GUI." + x;
-            ItemStack i = ItemUtils.fromConfigSection(config.getConfigurationSection(key));
-            defaultItems.put(x, i);
-        });
     }
 
 }

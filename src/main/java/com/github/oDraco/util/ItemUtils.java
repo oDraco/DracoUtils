@@ -31,10 +31,10 @@ public abstract class ItemUtils {
     /**
      * Format itemstack to an 'RPG' format.
      *
-     * @param item   the item
-     * @param name   the name
-     * @param rarity the rarity
-     * @param type   the type
+     * @param item           the item
+     * @param name           the name
+     * @param rarity         the rarity
+     * @param type           the type
      * @param additionalLore additional lore for the item
      * @return the formatted item
      */
@@ -52,7 +52,7 @@ public abstract class ItemUtils {
 
         lore.add(typeLore);
         lore.add("");
-        if(additionalLore != null && additionalLore.length > 0) {
+        if (additionalLore != null && additionalLore.length > 0) {
             List<String> extraLore = Arrays.stream(additionalLore).map(x -> x.replace('&', '§')).collect(Collectors.toList());
             lore.addAll(extraLore);
             lore.add("");
@@ -85,12 +85,13 @@ public abstract class ItemUtils {
      * @return the formatted item stack
      */
     public static ItemStack formatItem(@Nonnull ItemStack item, String name, @Nullable List<String> lore) {
-        if(item.getType() == Material.AIR)
+        if (item.getType() == Material.AIR)
             return item;
         ItemStack i = item.clone();
         ItemMeta meta = i.getItemMeta();
-        if(lore != null) meta.setLore(lore.stream().map(x -> ChatColor.translateAlternateColorCodes('&', x)).collect(Collectors.toList()));
-        if(name != null) meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        if (lore != null)
+            meta.setLore(lore.stream().map(x -> ChatColor.translateAlternateColorCodes('&', x)).collect(Collectors.toList()));
+        if (name != null) meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
         i.setItemMeta(meta);
         return i;
     }
@@ -103,10 +104,10 @@ public abstract class ItemUtils {
      * @return the item stack OR an air item stack if fail
      */
     public static ItemStack parseItem(String item) {
-        if(item == null || item.isEmpty())
+        if (item == null || item.isEmpty())
             return new ItemStack(Material.AIR);
         Matcher matcher = ITEM_REGEX.matcher(item);
-        if(matcher.matches()) {
+        if (matcher.matches()) {
             String[] fields = item.split(":");
             short damage = fields.length >= 2 ? Short.parseShort(fields[1]) : 0;
             int amount = fields.length >= 3 ? Integer.parseInt(fields[2]) : 1;
@@ -127,9 +128,10 @@ public abstract class ItemUtils {
      * @return skin local ID
      */
     public static int getArmourersLocalID(ItemStack item) {
-        if(!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
+        if (!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
         NBTItem i = new NBTItem(item);
-        if(!i.hasTag("armourersWorkshop")) throw new IllegalStateException("Item doesn't have a Armourer's Workshop skin");
+        if (!i.hasTag("armourersWorkshop"))
+            throw new IllegalStateException("Item doesn't have a Armourer's Workshop skin");
         return i.getCompound("armourersWorkshop").getCompound("identifier").getInteger("localId");
     }
 
@@ -137,13 +139,13 @@ public abstract class ItemUtils {
      * Sets Armourer's Workshop to an item.
      *
      * @param item     the item
-     * @param id  the skin's ID
+     * @param id       the skin's ID
      * @param skinType the skin's type
-     * @param global if true, use global ID instead
+     * @param global   if true, use global ID instead
      * @return the item with skin set
      */
     public static ItemStack setArmourersSkin(ItemStack item, int id, ArmourerSkinType skinType, boolean global) {
-        if(!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
+        if (!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
         NBTItem i = new NBTItem(item);
 
         i.removeKey("armourersWorkshop");
@@ -172,12 +174,12 @@ public abstract class ItemUtils {
     /**
      * Apply's the unbreakable tag to an item
      *
-     * @param item the itemstack
+     * @param item        the itemstack
      * @param unbreakable true/false
      * @return a new itemstack with the unbreakable tag set
      */
     public static ItemStack setUnbreakable(ItemStack item, boolean unbreakable) {
-        if(!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
+        if (!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
         NBTItem nbtItem = new NBTItem(item);
         nbtItem.setBoolean("Unbreakable", unbreakable);
         return nbtItem.getItem();
@@ -186,15 +188,15 @@ public abstract class ItemUtils {
     /**
      * Add an attribute modifier to an item
      *
-     * @param item the item stack to receive the attribute
+     * @param item          the item stack to receive the attribute
      * @param attributeName the attribute's name, don't mistake with the name below. This is more like the 'ID' of the attribute. Like 'generic.attackDamage'
-     * @param name attribute's name
-     * @param amount attribute's value
-     * @param operation attribute's operation
+     * @param name          attribute's name
+     * @param amount        attribute's value
+     * @param operation     attribute's operation
      * @return the item stack with attribute set
      */
     public static ItemStack addAttribute(ItemStack item, String attributeName, String name, Double amount, AttributeOperation operation) {
-        if(!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
+        if (!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
         NBTItem i = new NBTItem(item);
         NBTCompoundList attributeModifiers = i.getCompoundList("AttributeModifiers");
         for (de.tr7zw.nbtapi.iface.ReadWriteNBT attributeModifier : attributeModifiers) {
@@ -215,10 +217,10 @@ public abstract class ItemUtils {
     /**
      * Add an attribute modifier to an item
      *
-     * @param item the item stack to receive the attribute
+     * @param item      the item stack to receive the attribute
      * @param attribute the attribute
-     * @param name attribute's name
-     * @param amount attribute's value
+     * @param name      attribute's name
+     * @param amount    attribute's value
      * @return the item stack with attribute set
      */
     public static ItemStack addAttribute(ItemStack item, ItemAttribute attribute, String name, Double amount) {
@@ -228,10 +230,10 @@ public abstract class ItemUtils {
     /**
      * Add an attribute modifier to an item
      *
-     * @param item the item stack to receive the attribute
+     * @param item      the item stack to receive the attribute
      * @param attribute the attribute
-     * @param name attribute's name
-     * @param amount attribute's value
+     * @param name      attribute's name
+     * @param amount    attribute's value
      * @param operation attribute's operation
      * @return the item stack with attribute set
      */
@@ -261,11 +263,11 @@ public abstract class ItemUtils {
      * @return the attribute
      */
     public static AttributeWrapper getAttribute(ItemStack item, String attribute, boolean name) {
-        if(!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
+        if (!isValid(item)) throw new IllegalArgumentException("Item can't be null or air");
         ReadableNBT nbt = NBT.readNbt(item);
 
         for (ReadWriteNBT attr : nbt.getCompoundList("AttributeModifiers")) {
-            if((name && attr.getString("Name").equalsIgnoreCase(attribute)) || attr.getString("AttributeName").equalsIgnoreCase(attribute)) {
+            if ((name && attr.getString("Name").equalsIgnoreCase(attribute)) || attr.getString("AttributeName").equalsIgnoreCase(attribute)) {
 
                 return new AttributeWrapper(
                         attr.getString("Name"),
@@ -320,7 +322,7 @@ public abstract class ItemUtils {
      */
     public static void giveItem(Player player, ItemStack item) {
         HashMap<Integer, ItemStack> overflow = player.getInventory().addItem(item);
-        if(!overflow.isEmpty()) {
+        if (!overflow.isEmpty()) {
             Location loc = player.getLocation();
             World world = loc.getWorld();
             overflow.values().forEach(x -> world.dropItem(loc, x));
@@ -382,12 +384,12 @@ public abstract class ItemUtils {
     public static ItemStack replaceLore(@Nonnull ItemStack item, @Nonnull Map<String, String> replace) {
         ItemStack i = item.clone();
         ItemMeta meta = i.getItemMeta();
-        if(meta == null || !meta.hasLore() || meta.getLore().isEmpty())
+        if (meta == null || !meta.hasLore() || meta.getLore().isEmpty())
             return i;
 
         List<String> newLore = meta.getLore().stream().map(x -> {
             final String[] y = {x};
-            replace.forEach((a,b) -> y[0] = y[0].replace(a, b));
+            replace.forEach((a, b) -> y[0] = y[0].replace(a, b));
             return y[0];
         }).collect(Collectors.toList());
 
@@ -408,7 +410,7 @@ public abstract class ItemUtils {
     public static ItemStack replaceLore(@Nonnull ItemStack item, @Nonnull String oldValue, @Nonnull String newValue) {
         ItemStack i = item.clone();
         ItemMeta meta = i.getItemMeta();
-        if(!meta.hasLore() || meta.getLore().isEmpty())
+        if (!meta.hasLore() || meta.getLore().isEmpty())
             return i;
 
         meta.setLore(meta.getLore().stream().map(x -> x.replace(oldValue, newValue)).collect(Collectors.toList()));
@@ -441,9 +443,9 @@ public abstract class ItemUtils {
                 section.getString("name"),
                 section.getStringList("lore")
         );
-        if(section.contains("glow") && section.getBoolean("glow"))
-            i=applyGlow(i);
-        if(section.contains("amount"))
+        if (section.contains("glow") && section.getBoolean("glow"))
+            i = applyGlow(i);
+        if (section.contains("amount"))
             i.setAmount(section.getInt("amount"));
         return i;
     }

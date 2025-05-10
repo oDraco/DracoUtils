@@ -6,5 +6,6 @@ import org.bukkit.inventory.ItemStack;
 public interface IIcon {
 
     void onClick(InventoryClickEvent event);
+
     ItemStack getIcon();
 }
