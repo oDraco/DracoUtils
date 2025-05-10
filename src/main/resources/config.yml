@@ -26,10 +26,19 @@ defaultItems: # Default items for some things
         - ''
         - '&7Clique aqui para ir para a página anterior'
         - ''
+    loading:
+      item: 'PAPER'
+      name: '&9Carregando Informações'
+      lore:
+        - ''
+        - '&7Por-favor aguarde'
+        - ''
 
 messages:
   "yes": "&aSIM"
   "no": "&cNÃO"
+  cooldown: "&4&lERRO! &cVocê precisa aguardar &e@cooldown &csegundo@s para realizar esta ação novamente!"
+  unexpectedError: "&4&lERRO! &cUm erro inesperado aconteceu. Por-favor tente novamente."
   leakPermission: "&4&lERRO! &cVocê não possui permissão para utilizar este comando!"
   onlyPlayer: "&4&lERRO! &cApenas jogadores podem utilizar este comando!"
   playerNotFound: "&4&lERRO! &cJogador não encontrado!"
@@ -55,6 +64,14 @@ time:
   second: "segundo"
   seconds: "segundos"
   and: " e "
+dayOfWeek:
+  MONDAY: "segunda-feira"
+  TUESDAY: "terça-feira"
+  WEDNESDAY: "quarta-feira"
+  THURSDAY: "quinta-feira"
+  FRIDAY: "sexta-feira"
+  SATURDAY: "sábado"
+  SUNDAY: "domingo"
 
 # ResourcePack URL for /texture command
 resourcePackURL: ""

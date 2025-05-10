@@ -1,8 +1,11 @@
 package com.github.oDraco.entities.inventory;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -13,6 +16,13 @@ import java.util.Map;
 public class SimpleInventory implements InventoryHolder {
 
     protected final Inventory inv;
+
+    @Getter
+    @Setter
+    protected Sound sound;
+    @Getter
+    @Setter
+    protected boolean playSound = true;
 
     @Getter
     protected final Map<Integer, IIcon> iconMap = new HashMap<>();
@@ -30,7 +40,10 @@ public class SimpleInventory implements InventoryHolder {
         if(slot < 0)
             return;
         iconMap.put(slot, icon);
-        inv.setItem(slot, icon.getIcon());
+        if(icon instanceof IIconAsync)
+            ((IIconAsync) icon).getIconAsync().thenAccept(x -> inv.setItem(slot, x));
+        else
+            inv.setItem(slot, icon.getIcon());
     }
 
     public void removeItem(int slot) {
@@ -43,16 +56,29 @@ public class SimpleInventory implements InventoryHolder {
     }
 
     public void updateInventory() {
+        inv.clear();
         for (int i = 0; i < inv.getSize(); i++) {
-            inv.setItem(i, new ItemStack(Material.AIR));
-            if(iconMap.containsKey(i))
-                inv.setItem(i, iconMap.get(i).getIcon());
+            if(iconMap.containsKey(i)) {
+                IIcon icon = iconMap.get(i);
+                inv.setItem(i, icon.getIcon());
+                if(icon instanceof IIconAsync) {
+                    int finalI = i;
+                    ((IIconAsync) icon).getIconAsync().thenAccept(x -> inv.setItem(finalI,x));
+                }
+            }
         }
     }
 
     public void clear() {
         iconMap.clear();
         inv.clear();
+    }
+
+    public void openInventory(Player player) {
+        player.closeInventory();
+        player.openInventory(getInventory());
+        if(playSound)
+            player.playSound(player.getLocation(), sound == null ? Sound.NOTE_PLING : sound, 1.0f, 1.0f);
     }
 
     @Override

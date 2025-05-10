@@ -2,13 +2,17 @@ package com.github.oDraco.util;
 
 import com.github.oDraco.DracoUtils;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import java.io.File;
+import java.io.InputStream;
 import java.security.MessageDigest;
+import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +34,26 @@ public class MiscUtils {
         TIME_VALUE.put('M', 2592000L); // month
     }
 
+    public static <T> T getRandomByWeight(Map<T, Integer> elements) {
+        ArrayList<T> objects = new ArrayList<>();
+        ArrayList<Integer> weights = new ArrayList<>();
+
+        int total = elements.values().stream().reduce(0, Integer::sum);
+        int random = (int) Math.round(Math.random()*total);
+
+        if(total <= 0)
+            return null;
+
+        int cursor = 0;
+        for (Map.Entry<T, Integer> entry : elements.entrySet()) {
+            cursor+=entry.getValue();
+            if(cursor >= random)
+                return entry.getKey();
+        }
+
+        return null;
+    }
+
     public static <T> T getRandomByWeight(List<T> elements, List<Integer> weights) {
         int total = weights.stream().reduce(0, Integer::sum);
 
@@ -45,10 +69,25 @@ public class MiscUtils {
     }
 
     public static YamlConfiguration getYamlConfiguration(JavaPlugin plugin, String fileName) {
+        return getYamlConfiguration(plugin, fileName, false);
+    }
+
+    public static YamlConfiguration getYamlConfiguration(JavaPlugin plugin, String fileName, boolean create) {
         File configFile = new File(plugin.getDataFolder(), fileName);
         if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
-            plugin.saveResource(fileName, false);
+            InputStream resource = plugin.getResource(fileName);
+            if(resource != null)
+                plugin.saveResource(fileName, false);
+            else if (create)
+                try {
+                    configFile.createNewFile();
+                } catch (Exception e) {
+                    DracoUtils instance = DracoUtils.getInstance();
+                    instance.getLogger().severe("An error occurred while writing a YAML file: " + e.getMessage());
+                    if(instance.debugEnabled())
+                        e.printStackTrace();
+                }
         }
         return YamlConfiguration.loadConfiguration(configFile);
     }
@@ -93,7 +132,7 @@ public class MiscUtils {
     public static String secondsToString(long seconds) {
         int[] timeUnits = {2592000, 604800, 86400, 3600, 60, 1};
         String[] timeLabels = {"month", "week", "day", "hour", "minute", "second"};
-        FileConfiguration config = DracoUtils.getInstance().getConfig();
+        FileConfiguration config = DracoUtils.getCachedConfig();
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < timeUnits.length; i++) {
@@ -123,6 +162,24 @@ public class MiscUtils {
                 return true;
         }
         return false;
+    }
+
+    public static DayOfWeek getDayOfWeek(String input) {
+        ConfigurationSection dayOfWeek = DracoUtils.getCachedConfig().getConfigurationSection("dayOfWeek");
+        String trim = input.trim();
+        for (String key : dayOfWeek.getKeys(false)) {
+            if(trim.equalsIgnoreCase(dayOfWeek.getString(key)))
+                return DayOfWeek.valueOf(key);
+        }
+        try {
+            return DayOfWeek.valueOf(trim.toUpperCase());
+        } catch (Exception e) {
+            try {
+                return DayOfWeek.of(Integer.parseInt(trim));
+            } catch (Exception ignored) {};
+        };
+
+        return null;
     }
 
     // https://github.com/Kqnth/Java-HWID/blob/master/HWID.java

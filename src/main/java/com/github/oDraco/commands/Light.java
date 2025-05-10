@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 public class Light implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        FileConfiguration cfg = DracoUtils.getInstance().getConfig();
+        FileConfiguration cfg = DracoUtils.getCachedConfig();
         if(!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("messages.onlyPlayer")));
             return true;

@@ -17,12 +17,16 @@ import org.bukkit.inventory.meta.SkullMeta;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * The type Item utils.
  */
 public abstract class ItemUtils {
+
+    private static final Pattern ITEM_REGEX = Pattern.compile(".[^:]+(?::\\d+)?(?::\\d+)?");
 
     /**
      * Format itemstack to an 'RPG' format.
@@ -93,16 +97,26 @@ public abstract class ItemUtils {
 
     /**
      * Parse item stack from string.
-     * In format: MATERIAL:DAMAGE
+     * In format: MATERIAL[:DAMAGE][:AMOUNT] or Serialized NBT String
      *
      * @param item the item string
-     * @return the item stack
+     * @return the item stack OR an air item stack if fail
      */
     public static ItemStack parseItem(String item) {
-        if(item == null || item.isEmpty()) return new ItemStack(Material.AIR);
-        String[] fields = item.split(":");
-        short damage = fields.length == 2 ? Short.parseShort(fields[1]) : 0;
-        return new ItemStack(Material.matchMaterial(fields[0]), 1, damage);
+        if(item == null || item.isEmpty())
+            return new ItemStack(Material.AIR);
+        Matcher matcher = ITEM_REGEX.matcher(item);
+        if(matcher.matches()) {
+            String[] fields = item.split(":");
+            short damage = fields.length >= 2 ? Short.parseShort(fields[1]) : 0;
+            int amount = fields.length >= 3 ? Integer.parseInt(fields[2]) : 1;
+            return new ItemStack(Material.matchMaterial(fields[0]), amount, damage);
+        }
+        try {
+            return NBT.itemStackFromNBT(NBT.parseNBT(item));
+        } catch (Exception e) {
+            return new ItemStack(Material.AIR);
+        }
     }
 
 
@@ -368,7 +382,7 @@ public abstract class ItemUtils {
     public static ItemStack replaceLore(@Nonnull ItemStack item, @Nonnull Map<String, String> replace) {
         ItemStack i = item.clone();
         ItemMeta meta = i.getItemMeta();
-        if(!meta.hasLore() || meta.getLore().isEmpty())
+        if(meta == null || !meta.hasLore() || meta.getLore().isEmpty())
             return i;
 
         List<String> newLore = meta.getLore().stream().map(x -> {
@@ -429,6 +443,8 @@ public abstract class ItemUtils {
         );
         if(section.contains("glow") && section.getBoolean("glow"))
             i=applyGlow(i);
+        if(section.contains("amount"))
+            i.setAmount(section.getInt("amount"));
         return i;
     }
 }

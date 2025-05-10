@@ -35,11 +35,11 @@ public abstract class PlayerManager {
 
 
     public static void sendConfigMessage(CommandSender sender, String key) {
-        sendConfigMessage(sender, key, DracoUtils.getInstance());
+        sendConfigMessage(sender, key, DracoUtils.getCachedConfig());
     }
 
     public static void sendConfigMessage(CommandSender sender, String key, Map<String, String> replaces) {
-        sendConfigMessage(sender, key, DracoUtils.getInstance(), replaces);
+        sendConfigMessage(sender, key, DracoUtils.getCachedConfig(), replaces);
     }
 
     public static void sendConfigMessage(CommandSender sender, String key, JavaPlugin plugin) {
@@ -106,12 +106,12 @@ public abstract class PlayerManager {
         }
     }
 
-        /**
-         * Sends an action bar to the specified player
-         *
-         * @param player the target
-         * @param message the message, if null the message isn't send
-         */
+    /**
+     * Sends an action bar to the specified player
+     *
+     * @param player the target
+     * @param message the message, if null the message isn't send
+     */
     public static void sendActionBar(Player player, @Nullable String message) {
         sendActionBar(player, message, true);
     }

@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class ResourcePack implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        FileConfiguration cfg = DracoUtils.getInstance().getConfig();
+        FileConfiguration cfg = DracoUtils.getCachedConfig();
         if(!(sender instanceof Player) && (args == null || args.length == 0)) {
             sender.sendMessage("§cUse /"+label+" <player> [<url>]");
             return true;

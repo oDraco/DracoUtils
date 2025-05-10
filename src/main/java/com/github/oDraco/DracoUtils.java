@@ -23,6 +23,9 @@ public class DracoUtils extends DracoPlugin {
     private static DracoUtils instance;
 
     @Getter
+    private static FileConfiguration cachedConfig;
+
+    @Getter
     private static boolean dracoFLibLoaded = false;
     @Getter
     private static boolean dracoCoreLoaded = false;
@@ -39,8 +42,10 @@ public class DracoUtils extends DracoPlugin {
         instance = this;
 
         saveDefaultConfig();
-
+        cachedConfig = getConfig();
         loadDefaultItems();
+
+
 
         worldEditLoaded = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
         mActionBarLoaded = Bukkit.getPluginManager().isPluginEnabled("mactionbarapi");
@@ -79,17 +84,11 @@ public class DracoUtils extends DracoPlugin {
     }
 
     private static void loadDefaultItems() {
-        FileConfiguration config = getInstance().getConfig();
+        FileConfiguration config = getCachedConfig();
 
         config.getConfigurationSection("defaultItems.GUI").getKeys(false).forEach(x -> {
-            String key = "defaultItems.GUI." + x + ".";
-            ItemStack i = ItemUtils.formatItem(
-                    ItemUtils.parseItem(config.getString(key + "item")),
-                    config.getString(key + "name"),
-                    config.getStringList(key + "lore")
-            );
-            if(config.contains(key+"glow") && config.getBoolean(key+"glow"))
-                i = ItemUtils.applyGlow(i);
+            String key = "defaultItems.GUI." + x;
+            ItemStack i = ItemUtils.fromConfigSection(config.getConfigurationSection(key));
             defaultItems.put(x, i);
         });
     }
