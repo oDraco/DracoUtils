@@ -106,6 +106,20 @@ public abstract class PlayerManager {
     }
 
     /**
+     *
+     * Gets a player by their nickname, even if it is offline.
+     *
+     * @param nickname player's nickname, case-sensitive.
+     * @return offline player OR null if none find
+     */
+    public static OfflinePlayer getPlayer(String nickname) {
+        OfflinePlayer p = Bukkit.getPlayerExact(nickname);
+        if(p != null)
+            return p;
+        return Arrays.stream(Bukkit.getOfflinePlayers()).filter(x -> x.getName().equals(nickname)).findAny().orElse(null);
+    }
+
+    /**
      * Sends an action bar to the specified player
      *
      * @param player  the target

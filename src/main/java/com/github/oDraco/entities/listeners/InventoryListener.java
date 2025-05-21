@@ -21,14 +21,14 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void inventoryClick(InventoryClickEvent e) {
-        if (e.getClickedInventory() == null) return;
-        if (!(e.getClickedInventory().getHolder() instanceof SimpleInventory)) return;
+        if (e.getInventory() == null) return;
+        if (!(e.getInventory().getHolder() instanceof SimpleInventory)) return;
 
         e.setCancelled(true);
 
-        SimpleInventory holder = (SimpleInventory) e.getClickedInventory().getHolder();
+        SimpleInventory holder = (SimpleInventory) e.getInventory().getHolder();
         Map<Integer, IIcon> iconMap = holder.getIconMap();
-        if (iconMap.containsKey(e.getSlot()))
-            iconMap.get(e.getSlot()).onClick(e);
+        if (iconMap.containsKey(e.getRawSlot()))
+            iconMap.get(e.getRawSlot()).onClick(e);
     }
 }
