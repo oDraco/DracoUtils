@@ -49,7 +49,7 @@ messages:
   successOperation: "&2&lSUCESSO! &aOperação realizada com sucesso!"
   dracoCoreNeeded: "&4&lERRO! &cEsta função necessita do mod DracoCore!"
 
-# This only need to be changed if you want to translate something
+# These only need to be changed if you want to translate something
 time:
   month: "mês"
   months: "meses"
@@ -65,13 +65,27 @@ time:
   seconds: "segundos"
   and: " e "
 dayOfWeek:
-  MONDAY: "segunda-feira"
-  TUESDAY: "terça-feira"
-  WEDNESDAY: "quarta-feira"
-  THURSDAY: "quinta-feira"
-  FRIDAY: "sexta-feira"
-  SATURDAY: "sábado"
-  SUNDAY: "domingo"
+  MONDAY:
+  - "segunda-feira"
+  - "segunda"
+  TUESDAY:
+  - "terça-feira"
+  - "terça"
+  - "terca-feira" # typos
+  - "terca"
+  WEDNESDAY:
+  - "quarta-feira"
+  - "quarta"
+  THURSDAY:
+  - "quinta-feira"
+  - "quinta"
+  FRIDAY:
+  - "sexta-feira"
+  - "sexta"
+  SATURDAY:
+  - "sábado"
+  SUNDAY:
+  - "domingo"
 
 # ResourcePack URL for /texture command
 resourcePackURL: ""

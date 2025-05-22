@@ -168,19 +168,19 @@ public class MiscUtils {
         ConfigurationSection dayOfWeek = DracoUtils.getCachedConfig().getConfigurationSection("dayOfWeek");
         String trim = input.trim();
         for (String key : dayOfWeek.getKeys(false)) {
-            if (trim.equalsIgnoreCase(dayOfWeek.getString(key)))
-                return DayOfWeek.valueOf(key);
+            List<String> validValues = dayOfWeek.getStringList(key);
+            for (String s : validValues) {
+                if(trim.equalsIgnoreCase(s))
+                    return DayOfWeek.valueOf(key);
+            }
         }
         try {
             return DayOfWeek.valueOf(trim.toUpperCase());
         } catch (Exception e) {
             try {
                 return DayOfWeek.of(Integer.parseInt(trim));
-            } catch (Exception ignored) {
-            }
-            ;
+            } catch (Exception ignored) {}
         }
-        ;
 
         return null;
     }
