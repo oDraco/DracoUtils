@@ -5,7 +5,9 @@ import com.github.oDraco.entities.inventory.SimpleInventory;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Map;
@@ -30,5 +32,17 @@ public class InventoryListener implements Listener {
         Map<Integer, IIcon> iconMap = holder.getIconMap();
         if (iconMap.containsKey(e.getRawSlot()))
             iconMap.get(e.getRawSlot()).onClick(e);
+    }
+
+    @EventHandler
+    public void inventoryOpen(InventoryOpenEvent e) {
+        if(e.getInventory().getHolder() instanceof SimpleInventory)
+            ((SimpleInventory) e.getInventory().getHolder()).onOpen(e);
+    }
+
+    @EventHandler
+    public void inventoryClose(InventoryCloseEvent e) {
+        if(e.getInventory().getHolder() instanceof SimpleInventory)
+            ((SimpleInventory) e.getInventory().getHolder()).onClose(e);
     }
 }

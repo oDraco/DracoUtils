@@ -1,17 +1,19 @@
 package com.github.oDraco.entities.inventory;
 
+import com.github.oDraco.DracoUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class SimpleInventory implements InventoryHolder {
 
@@ -38,15 +40,21 @@ public class SimpleInventory implements InventoryHolder {
         if (slot < 0)
             return;
         iconMap.put(slot, icon);
-        if (icon instanceof IIconAsync)
-            ((IIconAsync) icon).getIconAsync().thenAccept(x -> inv.setItem(slot, x));
-        else
-            inv.setItem(slot, icon.getIcon());
+        updateSlot(slot);
+    }
+
+    public void setItemIf(int slot, IIcon icon, Predicate<SimpleInventory> condition) {
+        if(condition.test(this))
+            setItem(slot, icon);
     }
 
     public void removeItem(int slot) {
         iconMap.remove(slot);
-        inv.setItem(slot, new ItemStack(Material.AIR));
+        Runnable run = () -> inv.clear(slot);
+        if(Bukkit.isPrimaryThread())
+            run.run();
+        else
+            Bukkit.getScheduler().runTask(DracoUtils.getInstance(), run);
     }
 
     public IIcon getIcon(int slot) {
@@ -55,15 +63,23 @@ public class SimpleInventory implements InventoryHolder {
 
     public void updateInventory() {
         inv.clear();
-        for (int i = 0; i < inv.getSize(); i++) {
-            if (iconMap.containsKey(i)) {
-                IIcon icon = iconMap.get(i);
-                inv.setItem(i, icon.getIcon());
-                if (icon instanceof IIconAsync) {
-                    int finalI = i;
-                    ((IIconAsync) icon).getIconAsync().thenAccept(x -> inv.setItem(finalI, x));
-                }
-            }
+        for (int i = 0; i < inv.getSize(); i++)
+            updateSlot(i);
+    }
+
+    public void updateSlot(int slot) {
+        inv.clear(slot);
+        if (iconMap.containsKey(slot)) {
+            IIcon icon = iconMap.get(slot);
+            Runnable run = () -> {
+                inv.setItem(slot, icon.getIcon());
+                if (icon instanceof IIconAsync)
+                    ((IIconAsync) icon).getIconAsync().thenAccept(x -> inv.setItem(slot, x));
+            };
+            if(Bukkit.isPrimaryThread())
+                run.run();
+            else
+                Bukkit.getScheduler().runTask(DracoUtils.getInstance(), run);
         }
     }
 
@@ -78,6 +94,10 @@ public class SimpleInventory implements InventoryHolder {
         if (playSound)
             player.playSound(player.getLocation(), sound == null ? Sound.NOTE_PLING : sound, 1.0f, 1.0f);
     }
+
+    public void onOpen(InventoryOpenEvent event) {}
+
+    public void onClose(InventoryCloseEvent event) {}
 
     @Override
     public Inventory getInventory() {

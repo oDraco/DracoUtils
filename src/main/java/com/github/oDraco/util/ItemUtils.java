@@ -382,18 +382,31 @@ public abstract class ItemUtils {
      * @return the item stack
      */
     public static ItemStack replaceLore(@Nonnull ItemStack item, @Nonnull Map<String, String> replace) {
+        return replaceStrings(item, replace, false, true);
+    }
+
+    public static ItemStack replaceStrings(@Nonnull ItemStack item, @Nonnull Map<String, String> replace, boolean replaceName, boolean replaceLore) {
         ItemStack i = item.clone();
+        if(!(replaceLore || replaceName))
+            return i;
         ItemMeta meta = i.getItemMeta();
-        if (meta == null || !meta.hasLore() || meta.getLore().isEmpty())
+        if (meta == null || (replaceLore && !meta.hasLore() || meta.getLore().isEmpty()) || (replaceName && !meta.hasDisplayName()))
             return i;
 
-        List<String> newLore = meta.getLore().stream().map(x -> {
-            final String[] y = {x};
-            replace.forEach((a, b) -> y[0] = y[0].replace(a, b));
-            return y[0];
-        }).collect(Collectors.toList());
+        if(replaceLore) {
+            List<String> newLore = meta.getLore().stream().map(x -> {
+                final String[] y = {x};
+                replace.forEach((a, b) -> y[0] = y[0].replace(a, b));
+                return y[0];
+            }).collect(Collectors.toList());
 
-        meta.setLore(newLore);
+            meta.setLore(newLore);
+        }
+        if(replaceName) {
+            final String[] name = {meta.getDisplayName()};
+            replace.forEach((k,v) -> name[0] = name[0].replace(k, v));
+            meta.setDisplayName(name[0]);
+        }
         i.setItemMeta(meta);
 
         return i;

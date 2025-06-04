@@ -33,6 +33,14 @@ defaultItems: # Default items for some things
         - ''
         - '&7Por-favor aguarde'
         - ''
+    error:
+      item: 'BEDROCK'
+      name: '&4&lERRO!'
+      lore:
+        - ''
+        - '&7Algo inesperado aconteceu.'
+        - '&7Por-favor tente novamente.'
+        - ''
 
 messages:
   "yes": "&aSIM"

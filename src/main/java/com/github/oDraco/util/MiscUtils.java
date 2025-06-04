@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -183,6 +184,12 @@ public class MiscUtils {
         }
 
         return null;
+    }
+
+    public static <T> CompletableFuture<T> getFailedFuture(Throwable throwable) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        future.completeExceptionally(throwable);
+        return future;
     }
 
     // https://github.com/Kqnth/Java-HWID/blob/master/HWID.java

@@ -3,6 +3,7 @@ package com.github.oDraco.entities.inventory;
 import com.github.oDraco.DracoUtils;
 import com.github.oDraco.util.ItemUtils;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,13 +16,24 @@ public class PaginatedInventory extends SimpleInventory {
     protected final ArrayList<IIcon> icons = new ArrayList<>();
 
     @Getter
-    private int currentPage = 0;
+    protected int currentPage = 0;
     @Getter
-    private int maxPages = 1;
-    private int perPage;
+    protected int maxPages = 1;
+    protected int perPage;
 
     @Getter
-    private boolean fancy = false;
+    @Setter
+    protected boolean useFillers = true;
+
+    @Getter
+    protected boolean fancy = false;
+
+    @Getter
+    @Setter
+    protected int infoIndex = 5; // Relative to inv size
+    @Getter
+    @Setter
+    protected int backPageIndex = -2, nextPageIndex = 2; // Relative to info slot
 
     public PaginatedInventory(String title, int size) {
         super(title, size);
@@ -65,10 +77,12 @@ public class PaginatedInventory extends SimpleInventory {
         clear();
 
         // Put the fillers icons
-        int start = inv.getSize() - 9;
-        final IIcon filler = new BasicIconImpl(DracoUtils.getDefaultItems().get("filler"));
-        for (int i = 0; i < 9; i++) {
-            setItem(start + i, filler);
+        if(useFillers) {
+            int start = inv.getSize() - 9;
+            final IIcon filler = new BasicIconImpl(DracoUtils.getDefaultItems().get("filler"));
+            for (int i = 0; i < 9; i++) {
+                setItem(start + i, filler);
+            }
         }
 
         // Put the new icons
@@ -122,7 +136,7 @@ public class PaginatedInventory extends SimpleInventory {
     private void updatePageInfo() {
         HashMap<String, ItemStack> items = DracoUtils.getDefaultItems();
 
-        int infoSlot = inv.getSize() - 5;
+        int infoSlot = inv.getSize() - infoIndex;
 
         HashMap<String, String> replaces = new HashMap<>();
         replaces.put("{current}", String.valueOf(getCurrentPage()));
@@ -131,10 +145,10 @@ public class PaginatedInventory extends SimpleInventory {
         setItem(infoSlot, new BasicIconImpl(ItemUtils.replaceLore(items.get("pageInfo"), replaces)));
 
         if (currentPage > 1)
-            setItem(infoSlot - 2, new PageChangeIconImpl(this, items.get("backPage"), -1));
+            setItem(infoSlot + backPageIndex, new PageChangeIconImpl(this, items.get("backPage"), -1));
 
         if (currentPage < maxPages)
-            setItem(infoSlot + 2, new PageChangeIconImpl(this, items.get("nextPage"), +1));
+            setItem(infoSlot + nextPageIndex, new PageChangeIconImpl(this, items.get("nextPage"), +1));
     }
 
     private void updateMaxPages() {
