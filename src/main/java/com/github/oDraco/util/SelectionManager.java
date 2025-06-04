@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
+@SuppressWarnings("unused")
 public class SelectionManager {
 
     private static final Map<UUID, Entity> selections;

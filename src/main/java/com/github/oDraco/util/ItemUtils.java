@@ -21,9 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * The type Item utils.
- */
+@SuppressWarnings("unused")
 public abstract class ItemUtils {
 
     private static final Pattern ITEM_REGEX = Pattern.compile(".[^:]+(?::\\d+)?(?::\\d+)?");
@@ -387,13 +385,13 @@ public abstract class ItemUtils {
 
     public static ItemStack replaceStrings(@Nonnull ItemStack item, @Nonnull Map<String, String> replace, boolean replaceName, boolean replaceLore) {
         ItemStack i = item.clone();
-        if(!(replaceLore || replaceName))
+        if (!(replaceLore || replaceName))
             return i;
         ItemMeta meta = i.getItemMeta();
         if (meta == null || (replaceLore && !meta.hasLore() || meta.getLore().isEmpty()) || (replaceName && !meta.hasDisplayName()))
             return i;
 
-        if(replaceLore) {
+        if (replaceLore) {
             List<String> newLore = meta.getLore().stream().map(x -> {
                 final String[] y = {x};
                 replace.forEach((a, b) -> y[0] = y[0].replace(a, b));
@@ -402,9 +400,9 @@ public abstract class ItemUtils {
 
             meta.setLore(newLore);
         }
-        if(replaceName) {
+        if (replaceName) {
             final String[] name = {meta.getDisplayName()};
-            replace.forEach((k,v) -> name[0] = name[0].replace(k, v));
+            replace.forEach((k, v) -> name[0] = name[0].replace(k, v));
             meta.setDisplayName(name[0]);
         }
         i.setItemMeta(meta);

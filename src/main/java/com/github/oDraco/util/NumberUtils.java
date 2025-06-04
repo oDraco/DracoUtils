@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 // Fork from SrBlecaute
 // https://github.com/SrBlecaute01
+@SuppressWarnings("unused")
 public class NumberUtils {
 
     private static final Pattern FORMAT_PATTERN = Pattern.compile("^\\d{1,3}([a-zA-Z]+|\\.\\d{1,2}[\\D]+$)");

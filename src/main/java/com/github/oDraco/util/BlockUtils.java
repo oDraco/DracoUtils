@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+@SuppressWarnings("unused")
 public abstract class BlockUtils {
 
     public static Block[] getCubicSelection(Block center, int radius) {

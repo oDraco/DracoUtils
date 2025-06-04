@@ -36,13 +36,13 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void inventoryOpen(InventoryOpenEvent e) {
-        if(e.getInventory().getHolder() instanceof SimpleInventory)
+        if (e.getInventory().getHolder() instanceof SimpleInventory)
             ((SimpleInventory) e.getInventory().getHolder()).onOpen(e);
     }
 
     @EventHandler
     public void inventoryClose(InventoryCloseEvent e) {
-        if(e.getInventory().getHolder() instanceof SimpleInventory)
+        if (e.getInventory().getHolder() instanceof SimpleInventory)
             ((SimpleInventory) e.getInventory().getHolder()).onClose(e);
     }
 }

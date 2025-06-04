@@ -27,9 +27,7 @@ import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * The type Player manager.
- */
+@SuppressWarnings("unused")
 public abstract class PlayerManager {
 
 
@@ -106,7 +104,6 @@ public abstract class PlayerManager {
     }
 
     /**
-     *
      * Gets a player by their nickname, even if it is offline.
      *
      * @param nickname player's nickname, case-sensitive.
@@ -114,7 +111,7 @@ public abstract class PlayerManager {
      */
     public static OfflinePlayer getPlayer(String nickname) {
         OfflinePlayer p = Bukkit.getPlayerExact(nickname);
-        if(p != null)
+        if (p != null)
             return p;
         return Arrays.stream(Bukkit.getOfflinePlayers()).filter(x -> x.getName().equals(nickname)).findAny().orElse(null);
     }

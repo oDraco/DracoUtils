@@ -8,10 +8,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class BackIcon extends BasicIconImpl {
 
+    private final SimpleInventory menu;
     @Getter
     @Setter
     private boolean updateInventory = true;
-    private final SimpleInventory menu;
 
     public BackIcon(ItemStack item, SimpleInventory menu) {
         super(item);
@@ -20,7 +20,7 @@ public class BackIcon extends BasicIconImpl {
 
     @Override
     public void onClick(InventoryClickEvent e) {
-        if(updateInventory)
+        if (updateInventory)
             menu.updateInventory();
         menu.openInventory(((Player) e.getWhoClicked()));
     }

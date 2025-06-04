@@ -2,6 +2,7 @@ package com.github.oDraco.util;
 
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public abstract class StringUtils {
 
     public static String limitLength(String input, int length) {

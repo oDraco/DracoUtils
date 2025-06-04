@@ -77,7 +77,7 @@ public class PaginatedInventory extends SimpleInventory {
         clear();
 
         // Put the fillers icons
-        if(useFillers) {
+        if (useFillers) {
             int start = inv.getSize() - 9;
             final IIcon filler = new BasicIconImpl(DracoUtils.getDefaultItems().get("filler"));
             for (int i = 0; i < 9; i++) {

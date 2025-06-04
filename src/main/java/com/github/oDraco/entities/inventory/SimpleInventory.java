@@ -44,14 +44,14 @@ public class SimpleInventory implements InventoryHolder {
     }
 
     public void setItemIf(int slot, IIcon icon, Predicate<SimpleInventory> condition) {
-        if(condition.test(this))
+        if (condition.test(this))
             setItem(slot, icon);
     }
 
     public void removeItem(int slot) {
         iconMap.remove(slot);
         Runnable run = () -> inv.clear(slot);
-        if(Bukkit.isPrimaryThread())
+        if (Bukkit.isPrimaryThread())
             run.run();
         else
             Bukkit.getScheduler().runTask(DracoUtils.getInstance(), run);
@@ -76,7 +76,7 @@ public class SimpleInventory implements InventoryHolder {
                 if (icon instanceof IIconAsync)
                     ((IIconAsync) icon).getIconAsync().thenAccept(x -> inv.setItem(slot, x));
             };
-            if(Bukkit.isPrimaryThread())
+            if (Bukkit.isPrimaryThread())
                 run.run();
             else
                 Bukkit.getScheduler().runTask(DracoUtils.getInstance(), run);
@@ -95,9 +95,11 @@ public class SimpleInventory implements InventoryHolder {
             player.playSound(player.getLocation(), sound == null ? Sound.NOTE_PLING : sound, 1.0f, 1.0f);
     }
 
-    public void onOpen(InventoryOpenEvent event) {}
+    public void onOpen(InventoryOpenEvent event) {
+    }
 
-    public void onClose(InventoryCloseEvent event) {}
+    public void onClose(InventoryCloseEvent event) {
+    }
 
     @Override
     public Inventory getInventory() {

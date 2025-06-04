@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("unused")
 public class MiscUtils {
 
     private static final Pattern TIME_REGEX = Pattern.compile("(\\d+[sSmMhHdD])");
@@ -171,7 +172,7 @@ public class MiscUtils {
         for (String key : dayOfWeek.getKeys(false)) {
             List<String> validValues = dayOfWeek.getStringList(key);
             for (String s : validValues) {
-                if(trim.equalsIgnoreCase(s))
+                if (trim.equalsIgnoreCase(s))
                     return DayOfWeek.valueOf(key);
             }
         }
@@ -180,7 +181,8 @@ public class MiscUtils {
         } catch (Exception e) {
             try {
                 return DayOfWeek.of(Integer.parseInt(trim));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         return null;
