@@ -36,12 +36,16 @@ public class DracoUtils extends DracoPlugin {
 
     private static void loadDefaultItems() {
         FileConfiguration config = getCachedConfig();
-
+        try {
         config.getConfigurationSection("defaultItems.GUI").getKeys(false).forEach(x -> {
             String key = "defaultItems.GUI." + x;
             ItemStack i = ItemUtils.fromConfigSection(config.getConfigurationSection(key));
             defaultItems.put(x, i);
         });
+        } catch (Exception e) {
+            System.out.println("ERROR IN GENERATE DEFAULT ITEMS GUI (IGNORE)");
+            e.printStackTrace();
+        }
     }
 
     @Override
