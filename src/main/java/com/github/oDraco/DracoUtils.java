@@ -58,7 +58,7 @@ public class DracoUtils extends DracoPlugin {
 
 
         worldEditLoaded = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
-        mActionBarLoaded = Bukkit.getPluginManager().isPluginEnabled("mactionbarapi");
+        mActionBarLoaded = Bukkit.getPluginManager().isPluginEnabled("mactionbarapi"); // I shouldn't been using this. The ideal would be to the mActionBarAPI mod mixin into the Crucible class, like NecroTempus does
 
         try {
             Class.forName("com.github.oDraco.DracoCore.Main");

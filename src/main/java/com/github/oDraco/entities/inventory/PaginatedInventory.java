@@ -34,6 +34,9 @@ public class PaginatedInventory extends SimpleInventory {
     @Getter
     @Setter
     protected int backPageIndex = -2, nextPageIndex = 2; // Relative to info slot
+    @Getter
+    @Setter
+    protected int startIndexOffset = 0; // For fancy inventories
 
     public PaginatedInventory(String title, int size) {
         super(title, size);
@@ -104,7 +107,7 @@ public class PaginatedInventory extends SimpleInventory {
                 addedItems++;
             }
         } else {
-            invIndex = 10;
+            invIndex = 10 + startIndexOffset;
             int row = 0;
             for (IIcon icon : icons) {
                 if (startIndex > 0) {
